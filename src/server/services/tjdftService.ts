@@ -16,19 +16,12 @@ interface ProcessoTJDFT {
   }>;
 }
 
-/**
- * Busca informações de um processo no TJDFT
- * @param numeroProcesso Número do processo (ex: 0001234-56.2023.5.10.0001)
- * @returns Dados do processo
- */
-export async function buscarProcessoTJDFT(numeroProcesso: string): Promise<ProcessoTJDFT | null> {
+export async function buscarProcessoTJDFT(numeroProcesso: string ): Promise<ProcessoTJDFT | null> {
   try {
-    // Validar formato do número do processo
     if (!validarNumeroProcesso(numeroProcesso)) {
-      throw new Error('Número de processo inválido');
+      throw new Error('Numero de processo invalido');
     }
 
-    // Fazer requisição ao TJDFT
     const response = await axios.get(`${TJDFT_API_URL}/ConsultaPublica/listView.seam`, {
       params: {
         numeroProcesso: numeroProcesso
@@ -36,7 +29,6 @@ export async function buscarProcessoTJDFT(numeroProcesso: string): Promise<Proce
       timeout: 10000
     });
 
-    // Fazer parsing dos dados (simplificado)
     const processo = parseProcessoFromHTML(response.data, numeroProcesso);
     
     return processo;
@@ -46,19 +38,12 @@ export async function buscarProcessoTJDFT(numeroProcesso: string): Promise<Proce
   }
 }
 
-/**
- * Busca processos por CPF do cliente
- * @param cpf CPF do cliente
- * @returns Lista de processos
- */
 export async function buscarProcessosPorCPF(cpf: string): Promise<ProcessoTJDFT[]> {
   try {
-    // Validar CPF
     if (!validarCPF(cpf)) {
-      throw new Error('CPF inválido');
+      throw new Error('CPF invalido');
     }
 
-    // Fazer requisição ao TJDFT
     const response = await axios.get(`${TJDFT_API_URL}/ConsultaPublica/listView.seam`, {
       params: {
         cpf: cpf
@@ -66,7 +51,6 @@ export async function buscarProcessosPorCPF(cpf: string): Promise<ProcessoTJDFT[
       timeout: 10000
     });
 
-    // Fazer parsing dos dados
     const processos = parseProcessosFromHTML(response.data);
     
     return processos;
@@ -76,28 +60,18 @@ export async function buscarProcessosPorCPF(cpf: string): Promise<ProcessoTJDFT[
   }
 }
 
-/**
- * Valida o formato do número do processo
- */
 function validarNumeroProcesso(numeroProcesso: string): boolean {
-  // Formato: NNNNNNN-DD.AAAA.J.TT.OOOO
   const regex = /^\d{7}-\d{2}\.\d{4}\.\d{1}\.\d{2}\.\d{4}$/;
   return regex.test(numeroProcesso);
 }
 
-/**
- * Valida o CPF
- */
 function validarCPF(cpf: string): boolean {
-  // Remove caracteres especiais
   const cpfLimpo = cpf.replace(/\D/g, '');
   
-  // Verifica se tem 11 dígitos
   if (cpfLimpo.length !== 11) {
     return false;
   }
 
-  // Verifica se todos os dígitos são iguais
   if (/^(\d)\1{10}$/.test(cpfLimpo)) {
     return false;
   }
@@ -105,20 +79,15 @@ function validarCPF(cpf: string): boolean {
   return true;
 }
 
-/**
- * Faz parsing do HTML da página do TJDFT
- * (Simplificado - em produção, usar biblioteca de parsing HTML)
- */
 function parseProcessoFromHTML(html: string, numeroProcesso: string): ProcessoTJDFT | null {
   try {
-    // Simulação: em produção, usar cheerio ou similar para fazer parsing
     return {
       numeroProcesso: numeroProcesso,
-      status: 'Aguardando Sentença',
+      status: 'Aguardando Sentenca',
       ultimoAndamento: 'Despacho do Juiz',
       dataUltimoAndamento: new Date().toLocaleDateString('pt-BR'),
-      tribunal: 'TRT 10ª Região (DF/TO)',
-      juizado: 'Juizado Especial da Fazenda Pública',
+      tribunal: 'TRT 10a Regiao (DF/TO)',
+      juizado: 'Juizado Especial da Fazenda Publica',
       andamentos: [
         {
           data: new Date().toLocaleDateString('pt-BR'),
@@ -127,8 +96,8 @@ function parseProcessoFromHTML(html: string, numeroProcesso: string): ProcessoTJ
         },
         {
           data: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
-          descricao: 'Petição recebida',
-          tipo: 'PETIÇÃO'
+          descricao: 'Peticao recebida',
+          tipo: 'PETICAO'
         }
       ]
     };
@@ -138,20 +107,16 @@ function parseProcessoFromHTML(html: string, numeroProcesso: string): ProcessoTJ
   }
 }
 
-/**
- * Faz parsing de múltiplos processos do HTML
- */
 function parseProcessosFromHTML(html: string): ProcessoTJDFT[] {
   try {
-    // Simulação: em produção, fazer parsing real
     return [
       {
         numeroProcesso: '0001234-56.2023.5.10.0001',
-        status: 'Aguardando Sentença',
+        status: 'Aguardando Sentenca',
         ultimoAndamento: 'Despacho do Juiz',
         dataUltimoAndamento: new Date().toLocaleDateString('pt-BR'),
-        tribunal: 'TRT 10ª Região (DF/TO)',
-        juizado: 'Juizado Especial da Fazenda Pública',
+        tribunal: 'TRT 10a Regiao (DF/TO)',
+        juizado: 'Juizado Especial da Fazenda Publica',
         andamentos: []
       }
     ];
@@ -161,24 +126,18 @@ function parseProcessosFromHTML(html: string): ProcessoTJDFT[] {
   }
 }
 
-/**
- * Gera resumo humanizado do andamento usando IA
- */
 export async function gerarResumoAndamento(processo: ProcessoTJDFT): Promise<string> {
   try {
-    // Aqui seria integrado com OpenAI para gerar resumo
-    // Por enquanto, retorna um resumo template
-    
     const resumoTemplate = `
-      Seu processo está em fase de ${processo.status.toLowerCase()}. 
-      O último andamento foi "${processo.ultimoAndamento}" em ${processo.dataUltimoAndamento}.
+      Seu processo esta em fase de ${processo.status.toLowerCase()}. 
+      O ultimo andamento foi "${processo.ultimoAndamento}" em ${processo.dataUltimoAndamento}.
       O processo tramita no ${processo.tribunal}.
-      Acompanhe regularmente para não perder prazos importantes.
+      Acompanhe regularmente para nao perder prazos importantes.
     `;
 
     return resumoTemplate.trim();
   } catch (error) {
     console.error('Erro ao gerar resumo:', error);
-    return 'Não foi possível gerar resumo do processo.';
+    return 'Nao foi possivel gerar resumo do processo.';
   }
 }
