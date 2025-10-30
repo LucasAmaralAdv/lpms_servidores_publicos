@@ -5,8 +5,7 @@ import { authMiddleware, AuthRequest } from '../middleware';
 const router = Router();
 const prisma = new PrismaClient();
 
-// Listar processos
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Listar processosrouter.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const processos = await prisma.processo.findMany({
  where: {
@@ -28,8 +27,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Obter processo por ID
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Obter processo por IDrouter.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 
@@ -58,8 +56,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Criar processo
-router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Criar processorouter.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const {
  numeroProcesso,
@@ -121,8 +118,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Atualizar processo
-router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Atualizar processorouter.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 
@@ -155,8 +151,7 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Deletar processo
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Deletar processorouter.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 

@@ -5,8 +5,7 @@ import { authMiddleware, AuthRequest } from '../middleware';
 const router = Router();
 const prisma = new PrismaClient();
 
-// Listar clientes
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Listar clientesrouter.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const clientes = await prisma.cliente.findMany({
  where: {
@@ -27,8 +26,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Obter cliente por ID
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Obter cliente por IDrouter.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 
@@ -61,8 +59,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Criar cliente
-router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Criar clienterouter.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const {
  nome,
@@ -132,8 +129,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Atualizar cliente
-router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Atualizar clienterouter.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 
@@ -166,8 +162,7 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Deletar cliente
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Deletar clienterouter.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
 

@@ -5,8 +5,7 @@ import { authMiddleware, AuthRequest } from '../middleware';
 const router = Router();
 const prisma = new PrismaClient();
 
-// Obter estatisticas financeiras
-router.get('/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Obter estatisticas financeirasrouter.get('/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  // Simular dados (em producao, buscar do banco de dados)
  const stats = {
@@ -25,8 +24,7 @@ router.get('/stats', authMiddleware, async (req: AuthRequest, res: Response) => 
  }
 });
 
-// Listar movimentacoes financeiras
-router.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Listar movimentacoes financeirasrouter.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { tipo, categoria, dataInicio, dataFim } = req.query;
 
@@ -57,8 +55,7 @@ router.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Respo
  }
 });
 
-// Criar movimentacao financeira
-router.post('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Criar movimentacao financeirarouter.post('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { data, descricao, tipo, valor, categoria, processoId } = req.body;
 
@@ -83,8 +80,7 @@ router.post('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Resp
  }
 });
 
-// Listar previsoes de RPVs
-router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Listar previsoes de RPVsrouter.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { status, dataInicio, dataFim } = req.query;
 
@@ -125,8 +121,7 @@ router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
  }
 });
 
-// Criar previsao de RPV
-router.post('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Criar previsao de RPVrouter.post('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { clienteId, processoId, dataEstimada, valorEstimado, tese } = req.body;
 
@@ -151,8 +146,7 @@ router.post('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => 
  }
 });
 
-// Atualizar status de RPV
-router.put('/rpvs/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Atualizar status de RPVrouter.put('/rpvs/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { id } = req.params;
  const { status } = req.body;
@@ -173,8 +167,7 @@ router.put('/rpvs/:id', authMiddleware, async (req: AuthRequest, res: Response) 
  }
 });
 
-// Gerar relatorio financeiro
-router.get('/relatorio', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Gerar relatorio financeirorouter.get('/relatorio', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { dataInicio, dataFim, formato } = req.query;
 
@@ -202,8 +195,7 @@ router.get('/relatorio', authMiddleware, async (req: AuthRequest, res: Response)
  }
 });
 
-// Configurar alertas financeiros
-router.post('/alertas', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Configurar alertas financeirosrouter.post('/alertas', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { tipo, valor, email } = req.body;
 

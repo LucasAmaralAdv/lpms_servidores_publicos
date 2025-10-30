@@ -19,21 +19,18 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors({
+// Middlewareapp.use(cors({
  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/api/health', (req, res) => {
+// Health checkapp.get('/api/health', (req, res) => {
  res.json({ status: 'ok', message: 'LPMS Server is running' });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
+// API Routesapp.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/processos', processosRoutes);
 app.use('/api/documentos', documentosRoutes);
@@ -43,11 +40,9 @@ app.use('/api/peticoes', peticoesRoutes);
 app.use('/api/oportunidades', oportunidadesRoutes);
 app.use('/api/respostas', respostasRoutes);
 
-// Error handling
-app.use(errorHandler);
+// Error handlingapp.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
+// Start serverapp.listen(PORT, () => {
  console.log(`LPMS Server running on port ${PORT}`);
  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

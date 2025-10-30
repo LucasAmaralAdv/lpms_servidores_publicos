@@ -85,9 +85,9 @@ export function ClienteOnboarding() {
  // Simular envio
  console.log('Dados do cliente:', formData);
  console.log('Arquivos:', uploadedFiles);
- 
+
  setMessage(' Cliente cadastrado com sucesso! Voce recebera um e-mail de confirmacao.');
- 
+
  // Limpar formulario
  setTimeout(() => {
  setStep(1);
@@ -144,7 +144,7 @@ export function ClienteOnboarding() {
  {step === 1 && (
  <div className="form-step">
  <h2>Dados Pessoais</h2>
- 
+
  <div className="form-group">
  <label>Nome Completo *</label>
  <input
@@ -234,7 +234,7 @@ export function ClienteOnboarding() {
  {step === 2 && (
  <div className="form-step">
  <h2>Endereco</h2>
- 
+
  <div className="form-group">
  <label>Endereco</label>
  <input
@@ -322,7 +322,7 @@ export function ClienteOnboarding() {
  {step === 3 && (
  <div className="form-step">
  <h2>Dados Profissionais</h2>
- 
+
  <div className="form-group">
  <label>rgao onde trabalha/trabalhou</label>
  <input
@@ -480,7 +480,7 @@ export function ClienteOnboarding() {
  Voltar
  </button>
  )}
- 
+
  {step < 4 ? (
  <button
  type="button"
@@ -488,7 +488,7 @@ export function ClienteOnboarding() {
  className="btn btn-primary"
  disabled={loading}
  >
- Proximo 
+ Proximo
  </button>
  ) : (
  <button

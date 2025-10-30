@@ -4,8 +4,7 @@ import { authMiddleware, AuthRequest } from '../middleware';
 
 const router = Router();
 
-// Registro
-router.post('/register', async (req: Request, res: Response) => {
+// Registrorouter.post('/register', async (req: Request, res: Response) => {
  try {
  const { email, password, name, role } = req.body;
 
@@ -20,8 +19,7 @@ router.post('/register', async (req: Request, res: Response) => {
  }
 });
 
-// Login
-router.post('/login', async (req: Request, res: Response) => {
+// Loginrouter.post('/login', async (req: Request, res: Response) => {
  try {
  const { email, password } = req.body;
 
@@ -36,8 +34,7 @@ router.post('/login', async (req: Request, res: Response) => {
  }
 });
 
-// Verificar autenticacao
-router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Verificar autenticacaorouter.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  res.json(req.user);
  } catch (error: any) {

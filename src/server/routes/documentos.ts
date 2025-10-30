@@ -4,8 +4,7 @@ import { gerarProcuracao, gerarContrato, gerarDeclaracaoHipossuficiencia } from 
 
 const router = Router();
 
-// Gerar e baixar Procuracao
-router.post('/procuracao', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Gerar e baixar Procuracaorouter.post('/procuracao', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 
@@ -34,8 +33,7 @@ router.post('/procuracao', authMiddleware, async (req: AuthRequest, res: Respons
  }
 });
 
-// Gerar e baixar Contrato
-router.post('/contrato', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Gerar e baixar Contratorouter.post('/contrato', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 
@@ -64,8 +62,7 @@ router.post('/contrato', authMiddleware, async (req: AuthRequest, res: Response)
  }
 });
 
-// Gerar e baixar Declaracao de Hipossuficiencia
-router.post('/declaracao', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Gerar e baixar Declaracao de Hipossuficienciarouter.post('/declaracao', authMiddleware, async (req: AuthRequest, res: Response) => {
  try {
  const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 

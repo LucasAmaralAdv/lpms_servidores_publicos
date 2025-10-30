@@ -30,7 +30,7 @@ export async function buscarProcessoTJDFT(numeroProcesso: string ): Promise<Proc
  });
 
  const processo = parseProcessoFromHTML(response.data, numeroProcesso);
- 
+
  return processo;
  } catch (error) {
  console.error('Erro ao buscar processo no TJDFT:', error);
@@ -52,7 +52,7 @@ export async function buscarProcessosPorCPF(cpf: string): Promise<ProcessoTJDFT[
  });
 
  const processos = parseProcessosFromHTML(response.data);
- 
+
  return processos;
  } catch (error) {
  console.error('Erro ao buscar processos por CPF:', error);
@@ -67,7 +67,7 @@ function validarNumeroProcesso(numeroProcesso: string): boolean {
 
 function validarCPF(cpf: string): boolean {
  const cpfLimpo = cpf.replace(/\D/g, '');
- 
+
  if (cpfLimpo.length !== 11) {
  return false;
  }
@@ -129,7 +129,7 @@ function parseProcessosFromHTML(html: string): ProcessoTJDFT[] {
 export async function gerarResumoAndamento(processo: ProcessoTJDFT): Promise<string> {
  try {
  const resumoTemplate = `
- Seu processo esta em fase de ${processo.status.toLowerCase()}. 
+ Seu processo esta em fase de ${processo.status.toLowerCase()}.
  O ultimo andamento foi "${processo.ultimoAndamento}" em ${processo.dataUltimoAndamento}.
  O processo tramita no ${processo.tribunal}.
  Acompanhe regularmente para nao perder prazos importantes.

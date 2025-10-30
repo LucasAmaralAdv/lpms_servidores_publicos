@@ -60,7 +60,7 @@ export function ConsultaAndamento() {
  };
 
  const resultado = processosSimulados[searchValue];
- 
+
  if (resultado) {
  setProcesso(resultado);
  } else {

@@ -3,8 +3,7 @@ import { buscarProcessoTJDFT, buscarProcessosPorCPF, gerarResumoAndamento } from
 
 const router = Router();
 
-// Consultar processo por numero
-router.get('/processo/:numeroProcesso', async (req: Request, res: Response) => {
+// Consultar processo por numerorouter.get('/processo/:numeroProcesso', async (req: Request, res: Response) => {
  try {
  const { numeroProcesso } = req.params;
 
@@ -30,8 +29,7 @@ router.get('/processo/:numeroProcesso', async (req: Request, res: Response) => {
  }
 });
 
-// Consultar processos por CPF
-router.get('/cpf/:cpf', async (req: Request, res: Response) => {
+// Consultar processos por CPFrouter.get('/cpf/:cpf', async (req: Request, res: Response) => {
  try {
  const { cpf } = req.params;
 
