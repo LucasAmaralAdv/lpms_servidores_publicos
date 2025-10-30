@@ -1,1 +1,222 @@
-import { OpenAI } from 'openai';\n\nconst openai = new OpenAI({\n  apiKey: process.env.OPENAI_API_KEY\n});\n\ninterface DadosPeticao {\n  tipo: string;\n  tese: string;\n  cliente: string;\n  processo: string;\n  modeloReferencia?: string;\n  informacoesAdicionais?: string;\n}\n\ninterface TemplateModelo {\n  [key: string]: string;\n}\n\nconst templates: TemplateModelo = {\n  'replica-licenca-premio': `EXCELENTÍSSIMO SENHOR DOUTOR JUIZ\n\nVem, respeitosamente, perante Vossa Excelência, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar RÉPLICA ao processo nº [PROCESSO], relativo à demanda sobre LICENÇA-PRÊMIO, pelos motivos de fato e de direito a seguir expostos:\n\nI - DOS FATOS\n\nTrata-se de ação em que o cliente busca o reconhecimento de seu direito à licença-prêmio não usufruída durante sua carreira profissional.\n\nII - DO DIREITO\n\nA legislação trabalhista garante ao servidor público o direito à licença-prêmio como forma de reconhecimento ao tempo de serviço prestado.\n\nIII - DO PEDIDO\n\nPelo exposto, requer-se a procedência da demanda para condenar a parte adversa ao pagamento da verba devida.\n\nRespeitosamente submetido.`,\n\n  'replica-abono-permanencia': `EXCELENTÍSSIMO SENHOR DOUTOR JUIZ\n\nVem, respeitosamente, perante Vossa Excelência, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar RÉPLICA ao processo nº [PROCESSO], relativo à demanda sobre ABONO DE PERMANÊNCIA, pelos motivos de fato e de direito a seguir expostos:\n\nI - DOS FATOS\n\nO cliente faz jus ao recebimento do abono de permanência, conforme previsão constitucional e legal.\n\nII - DO DIREITO\n\nO abono de permanência é direito adquirido do servidor que se submete ao regime de aposentadoria por tempo de contribuição.\n\nIII - DO PEDIDO\n\nPelo exposto, requer-se a procedência da demanda.\n\nRespeitosamente submetido.`,\n\n  'recurso-padrao': `EXCELENTÍSSIMO SENHOR DOUTOR PRESIDENTE DO TRIBUNAL\n\nVem, respeitosamente, perante Vossa Excelência, o(a) cliente [CLIENTE], por seu advogado infra-assinado, interpor RECURSO ao processo nº [PROCESSO], pelos motivos de fato e de direito a seguir expostos:\n\nI - DOS FUNDAMENTOS DO RECURSO\n\nA decisão recorrida contraria a jurisprudência consolidada sobre a matéria.\n\nII - DO PEDIDO\n\nRequer-se o provimento do recurso para reformar a decisão recorrida.\n\nRespeitosamente submetido.`\n};\n\n/**\n * Gera uma petição baseada em modelo e informações do caso\n */\nexport async function gerarPeticao(dados: DadosPeticao): Promise<string> {\n  try {\n    // Obter template base\n    const chaveTemplate = `${dados.tipo}-${dados.tese.toLowerCase()}`;\n    let template = templates[chaveTemplate] || templates['replica-padrao'] || templates['recurso-padrao'];\n\n    // Substituir placeholders\n    let peticao = template\n      .replace('[CLIENTE]', dados.cliente)\n      .replace('[PROCESSO]', dados.processo);\n\n    // Se houver informações adicionais, usar IA para melhorar\n    if (dados.informacoesAdicionais && dados.informacoesAdicionais.trim()) {\n      peticao = await melhorarComIA(peticao, dados.informacoesAdicionais, dados.tese);\n    }\n\n    return peticao;\n  } catch (error) {\n    console.error('Erro ao gerar petição:', error);\n    throw new Error('Erro ao gerar petição');\n  }\n}\n\n/**\n * Melhora a petição usando IA (OpenAI)\n */\nasync function melhorarComIA(peticao: string, informacoesAdicionais: string, tese: string): Promise<string> {\n  try {\n    const prompt = `Você é um advogado especialista em direito trabalhista e administrativo. \n\nMelhor a seguinte petição jurídica sobre ${tese}, incorporando as informações adicionais fornecidas:\n\nPetição Original:\n${peticao}\n\nInformações Adicionais do Caso:\n${informacoesAdicionais}\n\nPor favor, melhore a petição mantendo a estrutura formal, mas tornando-a mais robusta e fundamentada com as informações fornecidas.`;\n\n    const response = await openai.chat.completions.create({\n      model: 'gpt-4.1-mini',\n      messages: [\n        {\n          role: 'user',\n          content: prompt\n        }\n      ],\n      max_tokens: 2000,\n      temperature: 0.7\n    });\n\n    const conteudo = response.choices[0]?.message?.content;\n    return conteudo || peticao;\n  } catch (error) {\n    console.error('Erro ao melhorar com IA:', error);\n    // Retornar petição original se IA falhar\n    return peticao;\n  }\n}\n\n/**\n * Analisa um documento e extrai informações relevantes\n */\nexport async function analisarDocumento(conteudo: string, tipo: string): Promise<string[]> {\n  try {\n    const prompt = `Você é um analista jurídico. Analise o seguinte documento de tipo \"${tipo}\" e extraia os pontos-chave relevantes para uma petição jurídica:\n\n${conteudo}\n\nForneça uma lista de pontos-chave em formato de tópicos.`;\n\n    const response = await openai.chat.completions.create({\n      model: 'gpt-4.1-mini',\n      messages: [\n        {\n          role: 'user',\n          content: prompt\n        }\n      ],\n      max_tokens: 1000,\n      temperature: 0.7\n    });\n\n    const conteudo_resposta = response.choices[0]?.message?.content || '';\n    return conteudo_resposta.split('\\n').filter(linha => linha.trim());\n  } catch (error) {\n    console.error('Erro ao analisar documento:', error);\n    return [];\n  }\n}\n\n/**\n * Gera um resumo de uma petição\n */\nexport async function gerarResumo(peticao: string): Promise<string> {\n  try {\n    const prompt = `Você é um advogado. Faça um resumo executivo da seguinte petição jurídica em no máximo 3 parágrafos:\n\n${peticao}`;\n\n    const response = await openai.chat.completions.create({\n      model: 'gpt-4.1-mini',\n      messages: [\n        {\n          role: 'user',\n          content: prompt\n        }\n      ],\n      max_tokens: 500,\n      temperature: 0.7\n    });\n\n    return response.choices[0]?.message?.content || 'Resumo não disponível';\n  } catch (error) {\n    console.error('Erro ao gerar resumo:', error);\n    return 'Resumo não disponível';\n  }\n}\n\n/**\n * Valida uma petição quanto a completude e qualidade\n */\nexport async function validarPeticao(peticao: string): Promise<{ valida: boolean; avisos: string[] }> {\n  const avisos: string[] = [];\n\n  // Validações básicas\n  if (!peticao.includes('Excelentíssimo')) {\n    avisos.push('Falta saudação formal ao juiz');\n  }\n\n  if (!peticao.includes('Pelos motivos')) {\n    avisos.push('Falta introdução dos motivos');\n  }\n\n  if (!peticao.includes('Pedido') && !peticao.includes('pedido')) {\n    avisos.push('Falta seção de pedidos');\n  }\n\n  if (peticao.length < 500) {\n    avisos.push('Petição muito curta, considere adicionar mais argumentação');\n  }\n\n  return {\n    valida: avisos.length === 0,\n    avisos\n  };\n}\n
+import { OpenAI } from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+interface DadosPeticao {
+  tipo: string;
+  tese: string;
+  cliente: string;
+  processo: string;
+  modeloReferencia?: string;
+  informacoesAdicionais?: string;
+}
+
+interface TemplateModelo {
+  [key: string]: string;
+}
+
+const templates: TemplateModelo = {
+  'replica-licenca-premio': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
+
+Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar REPLICA ao processo no [PROCESSO], relativo a demanda sobre LICENCA-PREMIO, pelos motivos de fato e de direito a seguir expostos:
+
+I - DOS FATOS
+
+Trata-se de acao em que o cliente busca o reconhecimento de seu direito a licenca-premio nao usufruida durante sua carreira profissional.
+
+II - DO DIREITO
+
+A legislacao trabalhista garante ao servidor publico o direito a licenca-premio como forma de reconhecimento ao tempo de servico prestado.
+
+III - DO PEDIDO
+
+Pelo exposto, requer-se a procedencia da demanda para condenar a parte adversa ao pagamento da verba devida.
+
+Respeitosamente submetido.`,
+
+  'replica-abono-permanencia': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
+
+Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar REPLICA ao processo no [PROCESSO], relativo a demanda sobre ABONO DE PERMANENCIA, pelos motivos de fato e de direito a seguir expostos:
+
+I - DOS FATOS
+
+O cliente faz jus ao recebimento do abono de permanencia, conforme previsao constitucional e legal.
+
+II - DO DIREITO
+
+O abono de permanencia e direito adquirido do servidor que se submete ao regime de aposentadoria por tempo de contribuicao.
+
+III - DO PEDIDO
+
+Pelo exposto, requer-se a procedencia da demanda.
+
+Respeitosamente submetido.`,
+
+  'recurso-padrao': `EXCELENTISSIMO SENHOR DOUTOR PRESIDENTE DO TRIBUNAL
+
+Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, interpor RECURSO ao processo no [PROCESSO], pelos motivos de fato e de direito a seguir expostos:
+
+I - DOS FUNDAMENTOS DO RECURSO
+
+A decisao recorrida contraria a jurisprudencia consolidada sobre a materia.
+
+II - DO PEDIDO
+
+Requer-se o provimento do recurso para reformar a decisao recorrida.
+
+Respeitosamente submetido.`
+};
+
+/**
+ * Gera uma peticao baseada em modelo e informacoes do caso
+ */
+export async function gerarPeticao(dados: DadosPeticao): Promise<string> {
+  try {
+    // Obter template base
+    const chaveTemplate = `${dados.tipo}-${dados.tese.toLowerCase()}`;
+    let template = templates[chaveTemplate] || templates['replica-padrao'] || templates['recurso-padrao'];
+
+    // Substituir placeholders
+    let peticao = template
+      .replace('[CLIENTE]', dados.cliente)
+      .replace('[PROCESSO]', dados.processo);
+
+    // Se houver informacoes adicionais, usar IA para melhorar
+    if (dados.informacoesAdicionais && dados.informacoesAdicionais.trim()) {
+      peticao = await melhorarComIA(peticao, dados.informacoesAdicionais, dados.tese);
+    }
+
+    return peticao;
+  } catch (error) {
+    console.error('Erro ao gerar peticao:', error);
+    throw new Error('Erro ao gerar peticao');
+  }
+}
+
+/**
+ * Melhora a peticao usando IA (OpenAI)
+ */
+async function melhorarComIA(peticao: string, informacoesAdicionais: string, tese: string): Promise<string> {
+  try {
+    const prompt = `Voce e um advogado especialista em direito trabalhista e administrativo. 
+
+Melhore a seguinte peticao juridica sobre ${tese}, incorporando as informacoes adicionais fornecidas:
+
+Peticao Original:
+${peticao}
+
+Informacoes Adicionais do Caso:
+${informacoesAdicionais}
+
+Por favor, melhore a peticao mantendo a estrutura formal, mas tornando-a mais robusta e fundamentada com as informacoes fornecidas.`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
+
+    const conteudo = response.choices[0]?.message?.content;
+    return conteudo || peticao;
+  } catch (error) {
+    console.error('Erro ao melhorar com IA:', error);
+    // Retornar peticao original se IA falhar
+    return peticao;
+  }
+}
+
+/**
+ * Analisa um documento e extrai informacoes relevantes
+ */
+export async function analisarDocumento(conteudo: string, tipo: string): Promise<string[]> {
+  try {
+    const prompt = `Voce e um analista juridico. Analise o seguinte documento de tipo "${tipo}" e extraia os pontos-chave relevantes para uma peticao juridica:
+
+${conteudo}
+
+Forneca uma lista de pontos-chave em formato de topicos.`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.7
+    });
+
+    const conteudo_resposta = response.choices[0]?.message?.content || '';
+    return conteudo_resposta.split('\n').filter(linha => linha.trim());
+  } catch (error) {
+    console.error('Erro ao analisar documento:', error);
+    return [];
+  }
+}
+
+/**
+ * Gera um resumo de uma peticao
+ */
+export async function gerarResumo(peticao: string): Promise<string> {
+  try {
+    const prompt = `Voce e um advogado. Faca um resumo executivo da seguinte peticao juridica em no maximo 3 paragrafos:
+
+${peticao}`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+
+    return response.choices[0]?.message?.content || 'Resumo nao disponivel';
+  } catch (error) {
+    console.error('Erro ao gerar resumo:', error);
+    return 'Resumo nao disponivel';
+  }
+}
+
+/**
+ * Valida uma peticao quanto a completude e qualidade
+ */
+export async function validarPeticao(peticao: string): Promise<{ valida: boolean; avisos: string[] }> {
+  const avisos: string[] = [];
+
+  // Validacoes basicas
+  if (!peticao.includes('EXCELENTISSIMO')) {
+    avisos.push('Falta saudacao formal ao juiz');
+  }
+
+  if (!peticao.includes('Pelos motivos')) {
+    avisos.push('Falta introducao dos motivos');
+  }
+
+  if (!peticao.includes('PEDIDO') && !peticao.includes('pedido')) {
+    avisos.push('Falta secao de pedidos');
+  }
+
+  if (peticao.length < 500) {
+    avisos.push('Peticao muito curta, considere adicionar mais argumentacao');
+  }
+
+  return {
+    valida: avisos.length === 0,
+    avisos
+  };
+}
