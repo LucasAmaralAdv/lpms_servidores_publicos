@@ -1,1 +1,203 @@
-import { OpenAI } from 'openai';\n\nconst openai = new OpenAI({\n  apiKey: process.env.OPENAI_API_KEY\n});\n\ninterface DadosCliente {\n  id: string;\n  nome: string;\n  cpf: string;\n  dataAdmissao: string;\n  dataAposentadoria: string;\n  cargo: string;\n  salario: number;\n  documentos?: string[];\n}\n\ninterface Oportunidade {\n  id: string;\n  tese: string;\n  confianca: number;\n  motivo: string;\n  documentosNecessarios: string[];\n}\n\nconst tesesDisponiveis = [\n  {\n    nome: 'Licença-Prêmio',\n    criterios: {\n      tempoMinimoServico: 5,\n      descricao: 'Direito a licença remunerada a cada 5 anos de serviço'\n    }\n  },\n  {\n    nome: 'Abono Permanência',\n    criterios: {\n      tempoMinimoContribuicao: 30,\n      descricao: 'Direito ao abono para quem se enquadra em aposentadoria por tempo de contribuição'\n    }\n  },\n  {\n    nome: 'Diferenças Salariais',\n    criterios: {\n      descricao: 'Possível diferença entre salário recebido e salário devido'\n    }\n  },\n  {\n    nome: 'Gratificação',\n    criterios: {\n      descricao: 'Direito a gratificações não recebidas'\n    }\n  },\n  {\n    nome: 'Indenização',\n    criterios: {\n      descricao: 'Direito a indenizações por danos morais ou materiais'\n    }\n  }\n];\n\n/**\n * Analisa um cliente e identifica oportunidades de ações\n */\nexport async function analisarClienteOportunidades(cliente: DadosCliente): Promise<Oportunidade[]> {\n  try {\n    const oportunidades: Oportunidade[] = [];\n\n    // Calcular tempo de serviço\n    const dataAdm = new Date(cliente.dataAdmissao);\n    const dataAposentadoria = new Date(cliente.dataAposentadoria);\n    const tempoServico = (dataAposentadoria.getTime() - dataAdm.getTime()) / (1000 * 60 * 60 * 24 * 365.25);\n\n    // Analisar cada tese\n    for (const tese of tesesDisponiveis) {\n      let confianca = 0;\n      let motivo = '';\n      const documentos: string[] = [];\n\n      switch (tese.nome) {\n        case 'Licença-Prêmio':\n          if (tempoServico >= 5) {\n            confianca = Math.min(95, 50 + tempoServico * 5);\n            motivo = `Cliente tem ${tempoServico.toFixed(1)} anos de serviço e pode ter direito a licença-prêmio não usufruída`;\n            documentos.push('Contracheque', 'Ficha Funcional', 'Certidão de Tempo de Serviço');\n          }\n          break;\n\n        case 'Abono Permanência':\n          if (tempoServico >= 25) {\n            confianca = Math.min(95, 70 + (tempoServico - 25) * 2);\n            motivo = `Cliente se enquadra nos critérios de aposentadoria por tempo de contribuição`;\n            documentos.push('Contracheque', 'Certidão de Aposentadoria', 'Comprovante de Contribuição');\n          }\n          break;\n\n        case 'Diferenças Salariais':\n          confianca = 60;\n          motivo = `Possível diferença entre salário recebido e salário devido`;\n          documentos.push('Contracheque', 'Folha de Pagamento', 'Decreto de Reajuste');\n          break;\n\n        case 'Gratificação':\n          confianca = 55;\n          motivo = `Possível direito a gratificações não recebidas`;\n          documentos.push('Contracheque', 'Decreto de Gratificação');\n          break;\n\n        case 'Indenização':\n          confianca = 40;\n          motivo = `Possível direito a indenizações por danos`;\n          documentos.push('Documentação de Danos', 'Comprovantes');\n          break;\n      }\n\n      if (confianca > 0) {\n        oportunidades.push({\n          id: `${cliente.id}-${tese.nome.toLowerCase().replace(/\\s/g, '-')}`,\n          tese: tese.nome,\n          confianca,\n          motivo,\n          documentosNecessarios: documentos\n        });\n      }\n    }\n\n    // Ordenar por confiança\n    return oportunidades.sort((a, b) => b.confianca - a.confianca);\n  } catch (error) {\n    console.error('Erro ao analisar oportunidades:', error);\n    return [];\n  }\n}\n\n/**\n * Analisa múltiplos clientes em massa\n */\nexport async function analisarClientesEmMassa(clientes: DadosCliente[]): Promise<Map<string, Oportunidade[]>> {\n  const resultados = new Map<string, Oportunidade[]>();\n\n  for (const cliente of clientes) {\n    const oportunidades = await analisarClienteOportunidades(cliente);\n    resultados.set(cliente.id, oportunidades);\n  }\n\n  return resultados;\n}\n\n/**\n * Gera um relatório de oportunidades\n */\nexport async function gerarRelatorioOportunidades(oportunidades: Oportunidade[]): Promise<string> {\n  try {\n    const prompt = `Você é um advogado especialista. Analise as seguintes oportunidades de ações jurídicas e gere um relatório executivo:\n\n${oportunidades.map(o => `- ${o.tese}: ${o.motivo} (Confiança: ${o.confianca}%)`).join('\\n')}\n\nGere um relatório profissional com:\n1. Resumo das oportunidades\n2. Recomendações de prioridade\n3. Próximos passos`;\n\n    const response = await openai.chat.completions.create({\n      model: 'gpt-4.1-mini',\n      messages: [\n        {\n          role: 'user',\n          content: prompt\n        }\n      ],\n      max_tokens: 1000,\n      temperature: 0.7\n    });\n\n    return response.choices[0]?.message?.content || 'Relatório não disponível';\n  } catch (error) {\n    console.error('Erro ao gerar relatório:', error);\n    return 'Erro ao gerar relatório';\n  }\n}\n\n/**\n * Calcula o valor potencial de uma oportunidade\n */\nexport function calcularValorPotencial(tese: string, tempoServico: number, salario: number): number {\n  let valor = 0;\n\n  switch (tese) {\n    case 'Licença-Prêmio':\n      // Aproximadamente 1/3 do salário por 30 dias de licença\n      valor = (salario / 3) * 30;\n      break;\n\n    case 'Abono Permanência':\n      // Aproximadamente 10% do salário mensal\n      valor = salario * 0.1 * 12;\n      break;\n\n    case 'Diferenças Salariais':\n      // Estimativa conservadora\n      valor = salario * 0.05 * 12;\n      break;\n\n    case 'Gratificação':\n      // Estimativa\n      valor = salario * 0.15;\n      break;\n\n    case 'Indenização':\n      // Estimativa\n      valor = salario * 3;\n      break;\n  }\n\n  return valor;\n}\n\n/**\n * Prioriza oportunidades por valor e confiança\n */\nexport function priorizarOportunidades(\n  oportunidades: Oportunidade[],\n  salario: number,\n  tempoServico: number\n): Oportunidade[] {\n  return oportunidades\n    .map(opp => ({\n      ...opp,\n      valorPotencial: calcularValorPotencial(opp.tese, tempoServico, salario),\n      score: opp.confianca * 0.7 + (calcularValorPotencial(opp.tese, tempoServico, salario) / salario) * 30\n    }))\n    .sort((a, b) => (b as any).score - (a as any).score)\n    .map(({ valorPotencial, score, ...opp }) => opp);\n}\n
+import { OpenAI } from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+interface DadosCliente {
+  id: string;
+  nome: string;
+  cpf: string;
+  dataAdmissao: string;
+  dataAposentadoria: string;
+  cargo: string;
+  salario: number;
+  documentos?: string[];
+}
+
+interface Oportunidade {
+  id: string;
+  tese: string;
+  confianca: number;
+  motivo: string;
+  documentosNecessarios: string[];
+}
+
+const tesesDisponiveis = [
+  {
+    nome: 'Licenca-Premio',
+    criterios: {
+      tempoMinimoServico: 5,
+      descricao: 'Direito a licenca remunerada a cada 5 anos de servico'
+    }
+  },
+  {
+    nome: 'Abono Permanencia',
+    criterios: {
+      tempoMinimoContribuicao: 30,
+      descricao: 'Direito ao abono para quem se enquadra em aposentadoria por tempo de contribuicao'
+    }
+  },
+  {
+    nome: 'Diferencas Salariais',
+    criterios: {
+      descricao: 'Possivel diferenca entre salario recebido e salario devido'
+    }
+  },
+  {
+    nome: 'Gratificacao',
+    criterios: {
+      descricao: 'Direito a gratificacoes nao recebidas'
+    }
+  },
+  {
+    nome: 'Indenizacao',
+    criterios: {
+      descricao: 'Direito a indenizacoes por danos morais ou materiais'
+    }
+  }
+];
+
+export async function analisarClienteOportunidades(cliente: DadosCliente): Promise<Oportunidade[]> {
+  try {
+    const oportunidades: Oportunidade[] = [];
+
+    const dataAdm = new Date(cliente.dataAdmissao);
+    const dataAposentadoria = new Date(cliente.dataAposentadoria);
+    const tempoServico = (dataAposentadoria.getTime() - dataAdm.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+
+    for (const tese of tesesDisponiveis) {
+      let confianca = 0;
+      let motivo = '';
+      const documentos: string[] = [];
+
+      switch (tese.nome) {
+        case 'Licenca-Premio':
+          if (tempoServico >= 5) {
+            confianca = Math.min(95, 50 + tempoServico * 5);
+            motivo = `Cliente tem ${tempoServico.toFixed(1)} anos de servico`;
+            documentos.push('Contracheque', 'Ficha Funcional', 'Certidao de Tempo de Servico');
+          }
+          break;
+
+        case 'Abono Permanencia':
+          if (tempoServico >= 25) {
+            confianca = Math.min(95, 70 + (tempoServico - 25) * 2);
+            motivo = 'Cliente se enquadra nos criterios de aposentadoria';
+            documentos.push('Contracheque', 'Certidao de Aposentadoria', 'Comprovante de Contribuicao');
+          }
+          break;
+
+        case 'Diferencas Salariais':
+          confianca = 60;
+          motivo = 'Possivel diferenca entre salario recebido e salario devido';
+          documentos.push('Contracheque', 'Folha de Pagamento', 'Decreto de Reajuste');
+          break;
+
+        case 'Gratificacao':
+          confianca = 55;
+          motivo = 'Possivel direito a gratificacoes nao recebidas';
+          documentos.push('Contracheque', 'Decreto de Gratificacao');
+          break;
+
+        case 'Indenizacao':
+          confianca = 40;
+          motivo = 'Possivel direito a indenizacoes por danos';
+          documentos.push('Documentacao de Danos', 'Comprovantes');
+          break;
+      }
+
+      if (confianca > 0) {
+        oportunidades.push({
+          id: `${cliente.id}-${tese.nome.toLowerCase().replace(/\\s/g, '-')}`,
+          tese: tese.nome,
+          confianca,
+          motivo,
+          documentosNecessarios: documentos
+        });
+      }
+    }
+
+    return oportunidades.sort((a, b) => b.confianca - a.confianca);
+  } catch (error) {
+    console.error('Erro ao analisar oportunidades:', error);
+    return [];
+  }
+}
+
+export async function analisarClientesEmMassa(clientes: DadosCliente[]): Promise<Map<string, Oportunidade[]>> {
+  const resultados = new Map<string, Oportunidade[]>();
+
+  for (const cliente of clientes) {
+    const oportunidades = await analisarClienteOportunidades(cliente);
+    resultados.set(cliente.id, oportunidades);
+  }
+
+  return resultados;
+}
+
+export async function gerarRelatorioOportunidades(oportunidades: Oportunidade[]): Promise<string> {
+  try {
+    const prompt = 'Voce e um advogado especialista. Analise as seguintes oportunidades de acoes juridicas';
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4.1-mini',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.7
+    });
+
+    return response.choices[0]?.message?.content || 'Relatorio nao disponivel';
+  } catch (error) {
+    console.error('Erro ao gerar relatorio:', error);
+    return 'Erro ao gerar relatorio';
+  }
+}
+
+export function calcularValorPotencial(tese: string, tempoServico: number, salario: number): number {
+  let valor = 0;
+
+  switch (tese) {
+    case 'Licenca-Premio':
+      valor = (salario / 3) * 30;
+      break;
+
+    case 'Abono Permanencia':
+      valor = salario * 0.1 * 12;
+      break;
+
+    case 'Diferencas Salariais':
+      valor = salario * 0.05 * 12;
+      break;
+
+    case 'Gratificacao':
+      valor = salario * 0.15;
+      break;
+
+    case 'Indenizacao':
+      valor = salario * 3;
+      break;
+  }
+
+  return valor;
+}
+
+export function priorizarOportunidades(
+  oportunidades: Oportunidade[],
+  salario: number,
+  tempoServico: number
+): Oportunidade[] {
+  return oportunidades
+    .map(opp => ({
+      ...opp,
+      valorPotencial: calcularValorPotencial(opp.tese, tempoServico, salario),
+      score: opp.confianca * 0.7 + (calcularValorPotencial(opp.tese, tempoServico, salario) / salario) * 30
+    }))
+    .sort((a, b) => (b as any).score - (a as any).score)
+    .map(({ valorPotencial, score, ...opp }) => opp);
+}
