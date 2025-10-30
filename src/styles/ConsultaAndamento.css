@@ -1,0 +1,374 @@
+.consulta-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consulta-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.consulta-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.consulta-header h1 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.consulta-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.consulta-form {
+  margin-bottom: 2rem;
+}
+
+.search-type-selector {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.search-type-selector label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+}
+
+.search-type-selector input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.search-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.search-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.placeholder {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.resultado-container {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.processo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.processo-header h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.aguardando-sentença {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.em-julgamento {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.status-badge.sentenciado {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.cumprimento {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.processo-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.info-card {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.info-card:hover {
+  border-color: #667eea;
+}
+
+.info-card h3 {
+  color: #667eea;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-card p {
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.info-card small {
+  color: #999;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.resumo-ia-section {
+  margin-bottom: 2rem;
+}
+
+.resumo-ia-section h3 {
+  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.resumo-box {
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e7ff 100%);
+  border-left: 4px solid #667eea;
+  padding: 1.5rem;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.resumo-box p {
+  color: #333;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.proximo-prazo-section {
+  margin-bottom: 2rem;
+}
+
+.proximo-prazo-section h3 {
+  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.prazo-card {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.prazo-card.alert {
+  background: #ffe0e0;
+  border-left-color: #ff6b6b;
+}
+
+.prazo-data {
+  color: #333;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.prazo-descricao {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.informacoes-importantes {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.informacoes-importantes h3 {
+  color: #333;
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.informacoes-importantes ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.informacoes-importantes li {
+  margin-bottom: 0.5rem;
+}
+
+.contato-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.contato-section h3 {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.contato-section p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.contato-info {
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.contato-info strong {
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .consulta-container {
+    padding: 1rem;
+  }
+
+  .consulta-card {
+    padding: 1.5rem;
+  }
+
+  .consulta-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-type-selector {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .processo-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .processo-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

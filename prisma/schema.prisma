@@ -1,0 +1,309 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USUÁRIOS E AUTENTICAÇÃO ============
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  name      String
+  role      String     @default("advogado") // advogado, secretaria, admin
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relações
+  clientes  Cliente[]
+  processos Processo[]
+  tarefas   Tarefa[]
+}
+
+// ============ CLIENTES ============
+
+model Cliente {
+  id                    String     @id @default(cuid())
+  
+  // Dados Pessoais
+  nome                  String
+  cpf                   String     @unique
+  rg                    String?
+  dataNascimento        DateTime?
+  estadoCivil           String?
+  telefone              String
+  email                 String
+  endereco              String?
+  numero                String?
+  complemento           String?
+  bairro                String?
+  cidade                String?
+  estado                String?
+  cep                   String?
+  
+  // Dados Profissionais
+  orgaoTrabalho         String?
+  cargo                 String?
+  matricula             String?
+  dataAdmissao          DateTime?
+  dataPrevistAposentadoria DateTime?
+  situacaoFuncional     String?  // ativo, aposentado, exonerado, etc
+  
+  // Dados Financeiros
+  salarioBase           Float?
+  ultimoContracheque    DateTime?
+  fichFinanceira        String?  // URL do arquivo
+  
+  // Controle
+  dataCadastro          DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  ativo                 Boolean    @default(true)
+  
+  // Relações
+  processos             Processo[]
+  documentos            Documento[]
+  comunicacoes          Comunicacao[]
+  oportunidades         Oportunidade[]
+  
+  // Criado por
+  criadoPor             User       @relation(fields: [criadoPorId], references: [id])
+  criadoPorId           String
+}
+
+// ============ PROCESSOS ============
+
+model Processo {
+  id                    String     @id @default(cuid())
+  
+  // Informações do Processo
+  numeroProcesso        String     @unique
+  tese                  String     // Licença-Prêmio, Abono Permanência, etc
+  descricao             String?
+  dataAjuizamento       DateTime
+  statusProcesso        String     // ativo, sentenciado, cumprimento, etc
+  
+  // Tribunal
+  tribunal              String     // TRT, TJDFT, STF, etc
+  juizado               String?    // JEF, Juizado Especial, etc
+  numeroJuizado         String?
+  
+  // Prazos
+  proximoPrazo          DateTime?
+  descricaoPrazo        String?
+  dataVencimentoPrazo   DateTime?
+  
+  // Dependências
+  dependenciaCliente    String?    // descrição do que o cliente precisa fazer
+  dependenciaSecretaria String?    // descrição do que a secretaria precisa fazer
+  
+  // Valores
+  valorCausaEstimado    Float?
+  valorSentenca         Float?
+  
+  // Controle
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  
+  // Relações
+  cliente               Cliente    @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteId             String
+  
+  prazos                Prazo[]
+  peticiones            Peticao[]
+  tarefas               Tarefa[]
+  andamentos            Andamento[]
+  
+  criadoPor             User       @relation(fields: [criadoPorId], references: [id])
+  criadoPorId           String
+}
+
+// ============ PRAZOS PROCESSUAIS ============
+
+model Prazo {
+  id                    String     @id @default(cuid())
+  
+  descricao             String
+  dataVencimento        DateTime
+  tipo                  String     // petição, resposta, recurso, etc
+  status                String     @default("pendente") // pendente, cumprido, vencido
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  
+  // Relações
+  processo              Processo   @relation(fields: [processoId], references: [id], onDelete: Cascade)
+  processoId            String
+}
+
+// ============ ANDAMENTOS PROCESSUAIS ============
+
+model Andamento {
+  id                    String     @id @default(cuid())
+  
+  descricao             String     @db.Text
+  dataAndamento         DateTime
+  tipo                  String     // sentença, despacho, publicação, etc
+  resumoIA              String?    @db.Text // resumo humanizado gerado por IA
+  
+  dataCriacao           DateTime   @default(now())
+  
+  // Relações
+  processo              Processo   @relation(fields: [processoId], references: [id], onDelete: Cascade)
+  processoId            String
+}
+
+// ============ PETIÇÕES ============
+
+model Peticao {
+  id                    String     @id @default(cuid())
+  
+  tipo                  String     // Petição Inicial, Réplica, Recurso, etc
+  titulo                String
+  conteudo              String     @db.Text
+  caminhoArquivo        String?    // URL do PDF gerado
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  
+  // Relações
+  processo              Processo   @relation(fields: [processoId], references: [id], onDelete: Cascade)
+  processoId            String
+}
+
+// ============ DOCUMENTOS ============
+
+model Documento {
+  id                    String     @id @default(cuid())
+  
+  tipo                  String     // Procuração, Contrato, Declaração, RG, CPF, etc
+  nome                  String
+  caminhoArquivo        String     // URL do arquivo
+  dataUpload            DateTime   @default(now())
+  tamanho               Int?       // em bytes
+  assinado              Boolean    @default(false)
+  dataAssinatura        DateTime?
+  
+  // Relações
+  cliente               Cliente    @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteId             String
+}
+
+// ============ TAREFAS ============
+
+model Tarefa {
+  id                    String     @id @default(cuid())
+  
+  titulo                String
+  descricao             String?
+  status                String     @default("pendente") // pendente, em_progresso, concluida
+  prioridade            String     @default("normal") // baixa, normal, alta, urgente
+  dataVencimento        DateTime?
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  
+  // Relações
+  processo              Processo?  @relation(fields: [processoId], references: [id], onDelete: SetNull)
+  processoId            String?
+  
+  atribuidoA            User       @relation(fields: [atribuidoAId], references: [id])
+  atribuidoAId          String
+}
+
+// ============ COMUNICAÇÕES COM CLIENTES ============
+
+model Comunicacao {
+  id                    String     @id @default(cuid())
+  
+  tipo                  String     // mensagem, email, whatsapp, etc
+  assunto               String?
+  conteudo              String     @db.Text
+  dataEnvio             DateTime   @default(now())
+  lido                  Boolean    @default(false)
+  
+  // Relações
+  cliente               Cliente    @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteId             String
+}
+
+// ============ OPORTUNIDADES ============
+
+model Oportunidade {
+  id                    String     @id @default(cuid())
+  
+  tese                  String     // Licença-Prêmio, Abono Permanência, etc
+  descricao             String     @db.Text
+  confianca             Float      @default(0.8) // 0 a 1, nível de confiança da IA
+  criteriosAtendidos    String     @db.Text // JSON com critérios que o cliente atende
+  
+  dataCriacao           DateTime   @default(now())
+  statusAnalise         String     @default("pendente") // pendente, analisada, descartada, acionada
+  
+  // Relações
+  cliente               Cliente    @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteId             String
+}
+
+// ============ FINANCEIRO ============
+
+model Financeiro {
+  id                    String     @id @default(cuid())
+  
+  tipo                  String     // receita, despesa, provisão
+  descricao             String
+  valor                 Float
+  dataPrevista          DateTime?
+  dataRealizada         DateTime?
+  status                String     @default("previsto") // previsto, realizado, cancelado
+  
+  // Para RPVs
+  clienteId             String?
+  processoId            String?
+  numeroRPV             String?
+  dataEstimadaPagamento DateTime?
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+}
+
+// ============ REQUISIÇÕES SEI-DF ============
+
+model RequisicaoSEI {
+  id                    String     @id @default(cuid())
+  
+  numeroRequisicao      String?
+  tipo                  String     // cliente, email, eprotocolo
+  descricao             String     @db.Text
+  dataRequisicao        DateTime
+  dataResposta          DateTime?
+  status                String     @default("pendente") // pendente, respondido, cancelado
+  
+  proximaRevisao        DateTime   // próxima data para revisar no SEI-DF
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+  
+  // Relações
+  processoId            String?
+}
+
+// ============ MODELOS DE PETIÇÕES ============
+
+model ModeloPeticao {
+  id                    String     @id @default(cuid())
+  
+  tese                  String     // Licença-Prêmio, Abono Permanência, etc
+  tipo                  String     // Petição Inicial, Réplica, Recurso, etc
+  conteudo              String     @db.Text
+  campos                String     @db.Text // JSON com campos variáveis
+  
+  dataCriacao           DateTime   @default(now())
+  dataUltimaAtualizacao DateTime   @updatedAt
+}
