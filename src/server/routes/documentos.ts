@@ -4,13 +4,13 @@ import { gerarProcuracao, gerarContrato, gerarDeclaracaoHipossuficiencia } from 
 
 const router = Router();
 
-// Gerar e baixar Procuração
+// Gerar e baixar Procuracao
 router.post('/procuracao', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 
     if (!nome || !cpf || !rg) {
-      return res.status(400).json({ error: 'Dados obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Dados obrigatorios nao preenchidos' });
     }
 
     const pdfStream = gerarProcuracao({
@@ -40,7 +40,7 @@ router.post('/contrato', authMiddleware, async (req: AuthRequest, res: Response)
     const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 
     if (!nome || !cpf || !rg) {
-      return res.status(400).json({ error: 'Dados obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Dados obrigatorios nao preenchidos' });
     }
 
     const pdfStream = gerarContrato({
@@ -64,13 +64,13 @@ router.post('/contrato', authMiddleware, async (req: AuthRequest, res: Response)
   }
 });
 
-// Gerar e baixar Declaração de Hipossuficiência
+// Gerar e baixar Declaracao de Hipossuficiencia
 router.post('/declaracao', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { nome, cpf, rg, endereco, numero, complemento, bairro, cidade, estado, cep } = req.body;
 
     if (!nome || !cpf || !rg) {
-      return res.status(400).json({ error: 'Dados obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Dados obrigatorios nao preenchidos' });
     }
 
     const pdfStream = gerarDeclaracaoHipossuficiencia({

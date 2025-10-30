@@ -46,16 +46,16 @@ export function ModuloFinanceiro() {
     {
       id: '1',
       data: '28/10/2025',
-      descricao: 'Honorários - Processo #001',
+      descricao: 'Honorarios - Processo #001',
       tipo: 'entrada',
       valor: 5000,
-      categoria: 'Honorários',
+      categoria: 'Honorarios',
       processo: '#001'
     },
     {
       id: '2',
       data: '27/10/2025',
-      descricao: 'Aluguel do escritório',
+      descricao: 'Aluguel do escritorio',
       tipo: 'saida',
       valor: 3000,
       categoria: 'Aluguel'
@@ -63,10 +63,10 @@ export function ModuloFinanceiro() {
     {
       id: '3',
       data: '26/10/2025',
-      descricao: 'Honorários - Processo #002',
+      descricao: 'Honorarios - Processo #002',
       tipo: 'entrada',
       valor: 4500,
-      categoria: 'Honorários',
+      categoria: 'Honorarios',
       processo: '#002'
     }
   ]);
@@ -74,12 +74,12 @@ export function ModuloFinanceiro() {
   const [rpvs, setRPVs] = useState<PrevisaoRPV[]>([
     {
       id: '1',
-      cliente: 'João Silva',
+      cliente: 'Joao Silva',
       processo: '#001',
       dataEstimada: '15/11/2025',
       valorEstimado: 25000,
       status: 'pendente',
-      tese: 'Licença-Prêmio'
+      tese: 'Licenca-Premio'
     },
     {
       id: '2',
@@ -88,7 +88,7 @@ export function ModuloFinanceiro() {
       dataEstimada: '20/11/2025',
       valorEstimado: 18000,
       status: 'pendente',
-      tese: 'Abono Permanência'
+      tese: 'Abono Permanencia'
     },
     {
       id: '3',
@@ -97,7 +97,7 @@ export function ModuloFinanceiro() {
       dataEstimada: '05/11/2025',
       valorEstimado: 32000,
       status: 'atrasado',
-      tese: 'Diferenças Salariais'
+      tese: 'Diferencas Salariais'
     }
   ]);
 
@@ -113,11 +113,11 @@ export function ModuloFinanceiro() {
   return (
     <div className="modulo-financeiro">
       <div className="financeiro-header">
-        <h1>Módulo Financeiro</h1>
-        <p>Gestão de fluxo de caixa e previsão de RPVs</p>
+        <h1>Modulo Financeiro</h1>
+        <p>Gestao de fluxo de caixa e previsao de RPVs</p>
       </div>
 
-      {/* Cards de Estatísticas */}
+      {/* Cards de Estatisticas */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">💰</div>
@@ -130,7 +130,7 @@ export function ModuloFinanceiro() {
         <div className="stat-card entrada">
           <div className="stat-icon">📈</div>
           <div className="stat-content">
-            <h3>Receita (Mês)</h3>
+            <h3>Receita (Mes)</h3>
             <p className="stat-value">R$ {stats.recebitaMes.toLocaleString('pt-BR')}</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function ModuloFinanceiro() {
         <div className="stat-card saida">
           <div className="stat-icon">📉</div>
           <div className="stat-content">
-            <h3>Despesas (Mês)</h3>
+            <h3>Despesas (Mes)</h3>
             <p className="stat-value">R$ {stats.despesasMes.toLocaleString('pt-BR')}</p>
           </div>
         </div>
@@ -146,7 +146,7 @@ export function ModuloFinanceiro() {
         <div className="stat-card lucro">
           <div className="stat-icon">✨</div>
           <div className="stat-content">
-            <h3>Lucro (Mês)</h3>
+            <h3>Lucro (Mes)</h3>
             <p className="stat-value">R$ {stats.lucroMes.toLocaleString('pt-BR')}</p>
           </div>
         </div>
@@ -169,7 +169,7 @@ export function ModuloFinanceiro() {
         </div>
       </div>
 
-      {/* Seção de Fluxo de Caixa */}
+      {/* Secao de Fluxo de Caixa */}
       <div className="section">
         <h2>Fluxo de Caixa</h2>
 
@@ -179,7 +179,7 @@ export function ModuloFinanceiro() {
             <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
               <option value="todas">Todas</option>
               <option value="entrada">Entradas</option>
-              <option value="saida">Saídas</option>
+              <option value="saida">Saidas</option>
             </select>
           </div>
 
@@ -187,7 +187,7 @@ export function ModuloFinanceiro() {
             <label>Categoria:</label>
             <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
               <option value="todas">Todas</option>
-              <option value="Honorários">Honorários</option>
+              <option value="Honorarios">Honorarios</option>
               <option value="Aluguel">Aluguel</option>
               <option value="Pessoal">Pessoal</option>
               <option value="Outros">Outros</option>
@@ -212,14 +212,14 @@ export function ModuloFinanceiro() {
               </div>
             ))
           ) : (
-            <p className="sem-dados">Nenhuma movimentação encontrada</p>
+            <p className="sem-dados">Nenhuma movimentacao encontrada</p>
           )}
         </div>
       </div>
 
-      {/* Seção de Previsão de RPVs */}
+      {/* Secao de Previsao de RPVs */}
       <div className="section">
-        <h2>Previsão de RPVs (Recebimentos Processuais Vinculados)</h2>
+        <h2>Previsao de RPVs (Recebimentos Processuais Vinculados)</h2>
 
         <div className="rpvs-grid">
           {rpvs.map(rpv => (
@@ -251,12 +251,12 @@ export function ModuloFinanceiro() {
         </div>
       </div>
 
-      {/* Seção de Ações Rápidas */}
+      {/* Secao de Acoes Rapidas */}
       <div className="section">
-        <h2>Ações Rápidas</h2>
+        <h2>Acoes Rapidas</h2>
         <div className="acoes-grid">
-          <button className="acao-btn">➕ Nova Movimentação</button>
-          <button className="acao-btn">📊 Gerar Relatório</button>
+          <button className="acao-btn">➕ Nova Movimentacao</button>
+          <button className="acao-btn">📊 Gerar Relatorio</button>
           <button className="acao-btn">💾 Exportar Dados</button>
           <button className="acao-btn">🔔 Configurar Alertas</button>
         </div>

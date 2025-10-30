@@ -45,7 +45,7 @@ export function Dashboard() {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Dashboard LPMS</h1>
-        <p>Visão geral do seu escritório de advocacia</p>
+        <p>Visao geral do seu escritorio de advocacia</p>
       </div>
 
       <div className="dashboard-grid">
@@ -92,7 +92,7 @@ export function Dashboard() {
         <div className="stat-card">
           <div className="stat-icon">💰</div>
           <div className="stat-content">
-            <h3>Receita Prevista (Mês)</h3>
+            <h3>Receita Prevista (Mes)</h3>
             <p className="stat-value">R$ {stats.recebitaPrevistoMes.toLocaleString('pt-BR')}</p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function Dashboard() {
 
       <div className="dashboard-sections">
         <section className="section">
-          <h2>Ações Rápidas</h2>
+          <h2>Acoes Rapidas</h2>
           <div className="action-buttons">
             <button className="action-btn">➕ Novo Cliente</button>
             <button className="action-btn">📄 Novo Processo</button>
@@ -110,19 +110,19 @@ export function Dashboard() {
         </section>
 
         <section className="section">
-          <h2>Prazos Próximos</h2>
+          <h2>Prazos Proximos</h2>
           <div className="list">
             <div className="list-item">
               <span className="date">Hoje</span>
               <span className="description">Prazo para resposta - Processo #001</span>
             </div>
             <div className="list-item">
-              <span className="date">Amanhã</span>
-              <span className="description">Prazo para petição - Processo #002</span>
+              <span className="date">Amanha</span>
+              <span className="description">Prazo para peticao - Processo #002</span>
             </div>
             <div className="list-item">
               <span className="date">Em 3 dias</span>
-              <span className="description">Revisão SEI-DF - Requisição #045</span>
+              <span className="description">Revisao SEI-DF - Requisicao #045</span>
             </div>
           </div>
         </section>

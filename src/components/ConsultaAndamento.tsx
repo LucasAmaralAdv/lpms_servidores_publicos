@@ -35,27 +35,27 @@ export function ConsultaAndamento() {
       const processosSimulados: { [key: string]: ProcessoInfo } = {
         '12345678901': {
           numeroProcesso: '0001234-56.2023.5.10.0001',
-          tese: 'Licença-Prêmio',
-          status: 'Aguardando Sentença',
+          tese: 'Licenca-Premio',
+          status: 'Aguardando Sentenca',
           dataAjuizamento: '15/03/2023',
-          tribunal: 'TRT 10ª Região (DF/TO)',
+          tribunal: 'TRT 10ª Regiao (DF/TO)',
           ultimoAndamento: 'Despacho do Juiz',
           dataUltimoAndamento: '28/10/2025',
           proximoPrazo: '15/11/2025',
           descricaoPrazo: 'Prazo para resposta da parte adversa',
-          resumoIA: 'Seu processo está em fase de julgamento. O juiz já analisou as petições e está preparando a sentença. Previsão: 2-3 meses para decisão final.'
+          resumoIA: 'Seu processo esta em fase de julgamento. O juiz ja analisou as peticoes e esta preparando a sentenca. Previsao: 2-3 meses para decisao final.'
         },
         '0001234-56.2023.5.10.0001': {
           numeroProcesso: '0001234-56.2023.5.10.0001',
-          tese: 'Licença-Prêmio',
-          status: 'Aguardando Sentença',
+          tese: 'Licenca-Premio',
+          status: 'Aguardando Sentenca',
           dataAjuizamento: '15/03/2023',
-          tribunal: 'TRT 10ª Região (DF/TO)',
+          tribunal: 'TRT 10ª Regiao (DF/TO)',
           ultimoAndamento: 'Despacho do Juiz',
           dataUltimoAndamento: '28/10/2025',
           proximoPrazo: '15/11/2025',
           descricaoPrazo: 'Prazo para resposta da parte adversa',
-          resumoIA: 'Seu processo está em fase de julgamento. O juiz já analisou as petições e está preparando a sentença. Previsão: 2-3 meses para decisão final.'
+          resumoIA: 'Seu processo esta em fase de julgamento. O juiz ja analisou as peticoes e esta preparando a sentenca. Previsao: 2-3 meses para decisao final.'
         }
       };
 
@@ -99,7 +99,7 @@ export function ConsultaAndamento() {
                 checked={searchType === 'numeroProcesso'}
                 onChange={(e) => setSearchType(e.target.value)}
               />
-              Buscar por Número do Processo
+              Buscar por Numero do Processo
             </label>
           </div>
 
@@ -111,7 +111,7 @@ export function ConsultaAndamento() {
               placeholder={
                 searchType === 'cpf'
                   ? 'Digite seu CPF (ex: 123.456.789-00)'
-                  : 'Digite o número do processo (ex: 0001234-56.2023.5.10.0001)'
+                  : 'Digite o numero do processo (ex: 0001234-56.2023.5.10.0001)'
               }
               required
             />
@@ -138,7 +138,7 @@ export function ConsultaAndamento() {
 
             <div className="processo-info-grid">
               <div className="info-card">
-                <h3>📋 Tese Jurídica</h3>
+                <h3>📋 Tese Juridica</h3>
                 <p>{processo.tese}</p>
               </div>
 
@@ -160,7 +160,7 @@ export function ConsultaAndamento() {
             </div>
 
             <div className="resumo-ia-section">
-              <h3>🤖 Resumo Inteligente (Análise por IA)</h3>
+              <h3>🤖 Resumo Inteligente (Analise por IA)</h3>
               <div className="resumo-box">
                 <p>{processo.resumoIA}</p>
               </div>
@@ -168,7 +168,7 @@ export function ConsultaAndamento() {
 
             {processo.proximoPrazo && (
               <div className="proximo-prazo-section">
-                <h3>⏰ Próximo Prazo</h3>
+                <h3>⏰ Proximo Prazo</h3>
                 <div className="prazo-card alert">
                   <p className="prazo-data">{processo.proximoPrazo}</p>
                   <p className="prazo-descricao">{processo.descricaoPrazo}</p>
@@ -177,18 +177,18 @@ export function ConsultaAndamento() {
             )}
 
             <div className="informacoes-importantes">
-              <h3>ℹ️ Informações Importantes</h3>
+              <h3>ℹ️ Informacoes Importantes</h3>
               <ul>
-                <li>Este é um resumo automático do andamento do seu processo.</li>
-                <li>Para informações detalhadas, consulte o site do tribunal.</li>
-                <li>Em caso de dúvidas, entre em contato com nosso escritório.</li>
-                <li>Atualizações são feitas automaticamente conforme os andamentos processuais.</li>
+                <li>Este e um resumo automatico do andamento do seu processo.</li>
+                <li>Para informacoes detalhadas, consulte o site do tribunal.</li>
+                <li>Em caso de duvidas, entre em contato com nosso escritorio.</li>
+                <li>Atualizacoes sao feitas automaticamente conforme os andamentos processuais.</li>
               </ul>
             </div>
 
             <div className="contato-section">
-              <h3>📞 Dúvidas?</h3>
-              <p>Entre em contato com nosso escritório:</p>
+              <h3>📞 Duvidas?</h3>
+              <p>Entre em contato com nosso escritorio:</p>
               <p className="contato-info">
                 <strong>WhatsApp:</strong> (61) 9.9841-8226<br/>
                 <strong>E-mail:</strong> contato@escritorio.com.br

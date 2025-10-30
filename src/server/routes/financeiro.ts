@@ -5,10 +5,10 @@ import { authMiddleware, AuthRequest } from '../middleware';
 const router = Router();
 const prisma = new PrismaClient();
 
-// Obter estatísticas financeiras
+// Obter estatisticas financeiras
 router.get('/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    // Simular dados (em produção, buscar do banco de dados)
+    // Simular dados (em producao, buscar do banco de dados)
     const stats = {
       saldoAtual: 125000,
       recebitaMes: 45000,
@@ -25,7 +25,7 @@ router.get('/stats', authMiddleware, async (req: AuthRequest, res: Response) => 
   }
 });
 
-// Listar movimentações financeiras
+// Listar movimentacoes financeiras
 router.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { tipo, categoria, dataInicio, dataFim } = req.query;
@@ -35,16 +35,16 @@ router.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Respo
       {
         id: '1',
         data: '28/10/2025',
-        descricao: 'Honorários - Processo #001',
+        descricao: 'Honorarios - Processo #001',
         tipo: 'entrada',
         valor: 5000,
-        categoria: 'Honorários',
+        categoria: 'Honorarios',
         processo: '#001'
       },
       {
         id: '2',
         data: '27/10/2025',
-        descricao: 'Aluguel do escritório',
+        descricao: 'Aluguel do escritorio',
         tipo: 'saida',
         valor: 3000,
         categoria: 'Aluguel'
@@ -57,16 +57,16 @@ router.get('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Respo
   }
 });
 
-// Criar movimentação financeira
+// Criar movimentacao financeira
 router.post('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { data, descricao, tipo, valor, categoria, processoId } = req.body;
 
     if (!data || !descricao || !tipo || !valor || !categoria) {
-      return res.status(400).json({ error: 'Campos obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });
     }
 
-    // Simular criação
+    // Simular criacao
     const movimentacao = {
       id: Math.random().toString(36).substr(2, 9),
       data,
@@ -83,7 +83,7 @@ router.post('/movimentacoes', authMiddleware, async (req: AuthRequest, res: Resp
   }
 });
 
-// Listar previsões de RPVs
+// Listar previsoes de RPVs
 router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { status, dataInicio, dataFim } = req.query;
@@ -92,12 +92,12 @@ router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
     const rpvs = [
       {
         id: '1',
-        cliente: 'João Silva',
+        cliente: 'Joao Silva',
         processo: '#001',
         dataEstimada: '15/11/2025',
         valorEstimado: 25000,
         status: 'pendente',
-        tese: 'Licença-Prêmio'
+        tese: 'Licenca-Premio'
       },
       {
         id: '2',
@@ -106,7 +106,7 @@ router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
         dataEstimada: '20/11/2025',
         valorEstimado: 18000,
         status: 'pendente',
-        tese: 'Abono Permanência'
+        tese: 'Abono Permanencia'
       },
       {
         id: '3',
@@ -115,7 +115,7 @@ router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
         dataEstimada: '05/11/2025',
         valorEstimado: 32000,
         status: 'atrasado',
-        tese: 'Diferenças Salariais'
+        tese: 'Diferencas Salariais'
       }
     ];
 
@@ -125,16 +125,16 @@ router.get('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// Criar previsão de RPV
+// Criar previsao de RPV
 router.post('/rpvs', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { clienteId, processoId, dataEstimada, valorEstimado, tese } = req.body;
 
     if (!clienteId || !processoId || !dataEstimada || !valorEstimado) {
-      return res.status(400).json({ error: 'Campos obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });
     }
 
-    // Simular criação
+    // Simular criacao
     const rpv = {
       id: Math.random().toString(36).substr(2, 9),
       clienteId,
@@ -158,10 +158,10 @@ router.put('/rpvs/:id', authMiddleware, async (req: AuthRequest, res: Response) 
     const { status } = req.body;
 
     if (!status) {
-      return res.status(400).json({ error: 'Status é obrigatório' });
+      return res.status(400).json({ error: 'Status e obrigatorio' });
     }
 
-    // Simular atualização
+    // Simular atualizacao
     const rpv = {
       id,
       status
@@ -173,12 +173,12 @@ router.put('/rpvs/:id', authMiddleware, async (req: AuthRequest, res: Response) 
   }
 });
 
-// Gerar relatório financeiro
+// Gerar relatorio financeiro
 router.get('/relatorio', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { dataInicio, dataFim, formato } = req.query;
 
-    // Simular geração de relatório
+    // Simular geracao de relatorio
     const relatorio = {
       periodo: `${dataInicio} a ${dataFim}`,
       totalEntradas: 45000,
@@ -192,8 +192,8 @@ router.get('/relatorio', authMiddleware, async (req: AuthRequest, res: Response)
     if (formato === 'pdf') {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="relatorio_financeiro.pdf"');
-      // Em produção, gerar PDF real
-      res.send('PDF do relatório');
+      // Em producao, gerar PDF real
+      res.send('PDF do relatorio');
     } else {
       res.json(relatorio);
     }
@@ -208,10 +208,10 @@ router.post('/alertas', authMiddleware, async (req: AuthRequest, res: Response) 
     const { tipo, valor, email } = req.body;
 
     if (!tipo || !valor) {
-      return res.status(400).json({ error: 'Campos obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });
     }
 
-    // Simular criação de alerta
+    // Simular criacao de alerta
     const alerta = {
       id: Math.random().toString(36).substr(2, 9),
       tipo,

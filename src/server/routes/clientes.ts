@@ -48,7 +48,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     });
 
     if (!cliente) {
-      return res.status(404).json({ error: 'Cliente não encontrado' });
+      return res.status(404).json({ error: 'Cliente nao encontrado' });
     }
 
     if (cliente.criadoPorId !== req.userId) {
@@ -88,16 +88,16 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     } = req.body;
 
     if (!nome || !cpf || !telefone || !email) {
-      return res.status(400).json({ error: 'Nome, CPF, telefone e email são obrigatórios' });
+      return res.status(400).json({ error: 'Nome, CPF, telefone e email sao obrigatorios' });
     }
 
-    // Verificar se CPF já existe
+    // Verificar se CPF ja existe
     const clienteExistente = await prisma.cliente.findUnique({
       where: { cpf }
     });
 
     if (clienteExistente) {
-      return res.status(400).json({ error: 'Cliente com este CPF já existe' });
+      return res.status(400).json({ error: 'Cliente com este CPF ja existe' });
     }
 
     const cliente = await prisma.cliente.create({
@@ -137,13 +137,13 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Verificar permissão
+    // Verificar permissao
     const cliente = await prisma.cliente.findUnique({
       where: { id }
     });
 
     if (!cliente) {
-      return res.status(404).json({ error: 'Cliente não encontrado' });
+      return res.status(404).json({ error: 'Cliente nao encontrado' });
     }
 
     if (cliente.criadoPorId !== req.userId) {
@@ -171,13 +171,13 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) =>
   try {
     const { id } = req.params;
 
-    // Verificar permissão
+    // Verificar permissao
     const cliente = await prisma.cliente.findUnique({
       where: { id }
     });
 
     if (!cliente) {
-      return res.status(404).json({ error: 'Cliente não encontrado' });
+      return res.status(404).json({ error: 'Cliente nao encontrado' });
     }
 
     if (cliente.criadoPorId !== req.userId) {

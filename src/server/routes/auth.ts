@@ -10,7 +10,7 @@ router.post('/register', async (req: Request, res: Response) => {
     const { email, password, name, role } = req.body;
 
     if (!email || !password || !name) {
-      return res.status(400).json({ error: 'Email, senha e nome são obrigatórios' });
+      return res.status(400).json({ error: 'Email, senha e nome sao obrigatorios' });
     }
 
     const result = await registerUser(email, password, name, role);
@@ -26,7 +26,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+      return res.status(400).json({ error: 'Email e senha sao obrigatorios' });
     }
 
     const result = await loginUser(email, password);
@@ -36,7 +36,7 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// Verificar autenticação
+// Verificar autenticacao
 router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     res.json(req.user);

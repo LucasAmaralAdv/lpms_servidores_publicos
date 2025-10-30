@@ -86,9 +86,9 @@ export function ClienteOnboarding() {
       console.log('Dados do cliente:', formData);
       console.log('Arquivos:', uploadedFiles);
       
-      setMessage('✅ Cliente cadastrado com sucesso! Você receberá um e-mail de confirmação.');
+      setMessage('✅ Cliente cadastrado com sucesso! Voce recebera um e-mail de confirmacao.');
       
-      // Limpar formulário
+      // Limpar formulario
       setTimeout(() => {
         setStep(1);
         setFormData({
@@ -198,7 +198,7 @@ export function ClienteOnboarding() {
                     <option value="solteiro">Solteiro(a)</option>
                     <option value="casado">Casado(a)</option>
                     <option value="divorciado">Divorciado(a)</option>
-                    <option value="viuvo">Viúvo(a)</option>
+                    <option value="viuvo">Viuvo(a)</option>
                   </select>
                 </div>
               </div>
@@ -230,13 +230,13 @@ export function ClienteOnboarding() {
             </div>
           )}
 
-          {/* Step 2: Endereço */}
+          {/* Step 2: Endereco */}
           {step === 2 && (
             <div className="form-step">
-              <h2>Endereço</h2>
+              <h2>Endereco</h2>
               
               <div className="form-group">
-                <label>Endereço</label>
+                <label>Endereco</label>
                 <input
                   type="text"
                   name="endereco"
@@ -248,7 +248,7 @@ export function ClienteOnboarding() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Número</label>
+                  <label>Numero</label>
                   <input
                     type="text"
                     name="numero"
@@ -324,13 +324,13 @@ export function ClienteOnboarding() {
               <h2>Dados Profissionais</h2>
               
               <div className="form-group">
-                <label>Órgão onde trabalha/trabalhou</label>
+                <label>Órgao onde trabalha/trabalhou</label>
                 <input
                   type="text"
                   name="orgaoTrabalho"
                   value={formData.orgaoTrabalho}
                   onChange={handleInputChange}
-                  placeholder="Ex: Secretaria de Educação"
+                  placeholder="Ex: Secretaria de Educacao"
                 />
               </div>
 
@@ -346,20 +346,20 @@ export function ClienteOnboarding() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Matrícula</label>
+                  <label>Matricula</label>
                   <input
                     type="text"
                     name="matricula"
                     value={formData.matricula}
                     onChange={handleInputChange}
-                    placeholder="Número da matrícula"
+                    placeholder="Numero da matricula"
                   />
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Data de Admissão</label>
+                  <label>Data de Admissao</label>
                   <input
                     type="date"
                     name="dataAdmissao"
@@ -379,13 +379,13 @@ export function ClienteOnboarding() {
               </div>
 
               <div className="form-group">
-                <label>Situação Funcional</label>
+                <label>Situacao Funcional</label>
                 <select name="situacaoFuncional" value={formData.situacaoFuncional} onChange={handleInputChange}>
                   <option value="">Selecione...</option>
                   <option value="ativo">Ativo</option>
                   <option value="aposentado">Aposentado</option>
                   <option value="exonerado">Exonerado</option>
-                  <option value="licenca">Em Licença</option>
+                  <option value="licenca">Em Licenca</option>
                 </select>
               </div>
             </div>
@@ -396,18 +396,18 @@ export function ClienteOnboarding() {
             <div className="form-step">
               <h2>Documentos</h2>
               <p className="step-description">
-                Faça o download dos documentos, assine digitalmente e envie de volta.
+                Faca o download dos documentos, assine digitalmente e envie de volta.
               </p>
 
               <div className="documents-section">
                 <div className="document-card">
-                  <h3>📄 Procuração</h3>
-                  <p>Documento que autoriza o escritório a agir em seu nome</p>
+                  <h3>📄 Procuracao</h3>
+                  <p>Documento que autoriza o escritorio a agir em seu nome</p>
                   <button type="button" className="download-btn">
-                    ⬇️ Baixar Procuração
+                    ⬇️ Baixar Procuracao
                   </button>
                   <label className="upload-label">
-                    📤 Enviar Procuração Assinada
+                    📤 Enviar Procuracao Assinada
                     <input
                       type="file"
                       accept=".pdf"
@@ -421,7 +421,7 @@ export function ClienteOnboarding() {
 
                 <div className="document-card">
                   <h3>📋 Contrato</h3>
-                  <p>Contrato de prestação de serviços jurídicos</p>
+                  <p>Contrato de prestacao de servicos juridicos</p>
                   <button type="button" className="download-btn">
                     ⬇️ Baixar Contrato
                   </button>
@@ -439,13 +439,13 @@ export function ClienteOnboarding() {
                 </div>
 
                 <div className="document-card">
-                  <h3>📝 Declaração de Hipossuficiência</h3>
-                  <p>Declaração de insuficiência de recursos para pagar custas</p>
+                  <h3>📝 Declaracao de Hipossuficiencia</h3>
+                  <p>Declaracao de insuficiencia de recursos para pagar custas</p>
                   <button type="button" className="download-btn">
-                    ⬇️ Baixar Declaração
+                    ⬇️ Baixar Declaracao
                   </button>
                   <label className="upload-label">
-                    📤 Enviar Declaração Assinada
+                    📤 Enviar Declaracao Assinada
                     <input
                       type="file"
                       accept=".pdf"
@@ -488,7 +488,7 @@ export function ClienteOnboarding() {
                 className="btn btn-primary"
                 disabled={loading}
               >
-                Próximo →
+                Proximo →
               </button>
             ) : (
               <button

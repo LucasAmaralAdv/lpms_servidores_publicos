@@ -11,14 +11,14 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Token não fornecido' });
+      return res.status(401).json({ error: 'Token nao fornecido' });
     }
 
     const token = authHeader.substring(7);
     const decoded = verifyToken(token);
 
     if (!decoded) {
-      return res.status(401).json({ error: 'Token inválido' });
+      return res.status(401).json({ error: 'Token invalido' });
     }
 
     req.userId = decoded.userId;
@@ -26,18 +26,18 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
 
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Erro na autenticação' });
+    res.status(401).json({ error: 'Erro na autenticacao' });
   }
 }
 
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   console.error('Erro:', err);
 
-  if (err.message === 'Usuário já existe') {
+  if (err.message === 'Usuario ja existe') {
     return res.status(400).json({ error: err.message });
   }
 
-  if (err.message === 'Usuário não encontrado' || err.message === 'Senha inválida') {
+  if (err.message === 'Usuario nao encontrado' || err.message === 'Senha invalida') {
     return res.status(401).json({ error: err.message });
   }
 

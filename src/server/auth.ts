@@ -28,19 +28,19 @@ export function verifyToken(token: string): any {
 
 export async function registerUser(email: string, password: string, name: string, role: string = 'advogado') {
   try {
-    // Verificar se usuário já existe
+    // Verificar se usuario ja existe
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
     if (existingUser) {
-      throw new Error('Usuário já existe');
+      throw new Error('Usuario ja existe');
     }
 
     // Hash da senha
     const hashedPassword = await hashPassword(password);
 
-    // Criar usuário
+    // Criar usuario
     const user = await prisma.user.create({
       data: {
         email,
@@ -69,20 +69,20 @@ export async function registerUser(email: string, password: string, name: string
 
 export async function loginUser(email: string, password: string) {
   try {
-    // Buscar usuário
+    // Buscar usuario
     const user = await prisma.user.findUnique({
       where: { email }
     });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error('Usuario nao encontrado');
     }
 
     // Verificar senha
     const isPasswordValid = await comparePasswords(password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error('Senha inválida');
+      throw new Error('Senha invalida');
     }
 
     // Gerar token
@@ -109,7 +109,7 @@ export async function getUserById(userId: string) {
     });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error('Usuario nao encontrado');
     }
 
     return {

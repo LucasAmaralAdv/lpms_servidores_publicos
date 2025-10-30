@@ -45,7 +45,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     });
 
     if (!processo) {
-      return res.status(404).json({ error: 'Processo não encontrado' });
+      return res.status(404).json({ error: 'Processo nao encontrado' });
     }
 
     if (processo.criadoPorId !== req.userId) {
@@ -81,16 +81,16 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     } = req.body;
 
     if (!numeroProcesso || !clienteId || !tese || !dataAjuizamento) {
-      return res.status(400).json({ error: 'Campos obrigatórios não preenchidos' });
+      return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });
     }
 
-    // Verificar se cliente existe e pertence ao usuário
+    // Verificar se cliente existe e pertence ao usuario
     const cliente = await prisma.cliente.findUnique({
       where: { id: clienteId }
     });
 
     if (!cliente || cliente.criadoPorId !== req.userId) {
-      return res.status(403).json({ error: 'Cliente não encontrado ou acesso negado' });
+      return res.status(403).json({ error: 'Cliente nao encontrado ou acesso negado' });
     }
 
     const processo = await prisma.processo.create({
@@ -126,13 +126,13 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Verificar permissão
+    // Verificar permissao
     const processo = await prisma.processo.findUnique({
       where: { id }
     });
 
     if (!processo) {
-      return res.status(404).json({ error: 'Processo não encontrado' });
+      return res.status(404).json({ error: 'Processo nao encontrado' });
     }
 
     if (processo.criadoPorId !== req.userId) {
@@ -160,13 +160,13 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) =>
   try {
     const { id } = req.params;
 
-    // Verificar permissão
+    // Verificar permissao
     const processo = await prisma.processo.findUnique({
       where: { id }
     });
 
     if (!processo) {
-      return res.status(404).json({ error: 'Processo não encontrado' });
+      return res.status(404).json({ error: 'Processo nao encontrado' });
     }
 
     if (processo.criadoPorId !== req.userId) {

@@ -3,19 +3,19 @@ import { buscarProcessoTJDFT, buscarProcessosPorCPF, gerarResumoAndamento } from
 
 const router = Router();
 
-// Consultar processo por número
+// Consultar processo por numero
 router.get('/processo/:numeroProcesso', async (req: Request, res: Response) => {
   try {
     const { numeroProcesso } = req.params;
 
     if (!numeroProcesso) {
-      return res.status(400).json({ error: 'Número do processo é obrigatório' });
+      return res.status(400).json({ error: 'Numero do processo e obrigatorio' });
     }
 
     const processo = await buscarProcessoTJDFT(numeroProcesso);
 
     if (!processo) {
-      return res.status(404).json({ error: 'Processo não encontrado' });
+      return res.status(404).json({ error: 'Processo nao encontrado' });
     }
 
     // Gerar resumo humanizado
@@ -36,7 +36,7 @@ router.get('/cpf/:cpf', async (req: Request, res: Response) => {
     const { cpf } = req.params;
 
     if (!cpf) {
-      return res.status(400).json({ error: 'CPF é obrigatório' });
+      return res.status(400).json({ error: 'CPF e obrigatorio' });
     }
 
     const processos = await buscarProcessosPorCPF(cpf);
