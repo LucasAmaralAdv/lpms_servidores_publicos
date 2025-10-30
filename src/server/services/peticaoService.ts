@@ -69,21 +69,15 @@ Requer-se o provimento do recurso para reformar a decisao recorrida.
 Respeitosamente submetido.`
 };
 
-/**
- * Gera uma peticao baseada em modelo e informacoes do caso
- */
 export async function gerarPeticao(dados: DadosPeticao): Promise<string> {
   try {
-    // Obter template base
-    const chaveTemplate = `${dados.tipo}-${dados.tese.toLowerCase()}`;
-    let template = templates[chaveTemplate] || templates['replica-padrao'] || templates['recurso-padrao'];
+    const chaveTemplate = dados.tipo + '-' + dados.tese.toLowerCase();
+    let template = templates[chaveTemplate] || templates['recurso-padrao'];
 
-    // Substituir placeholders
     let peticao = template
       .replace('[CLIENTE]', dados.cliente)
       .replace('[PROCESSO]', dados.processo);
 
-    // Se houver informacoes adicionais, usar IA para melhorar
     if (dados.informacoesAdicionais && dados.informacoesAdicionais.trim()) {
       peticao = await melhorarComIA(peticao, dados.informacoesAdicionais, dados.tese);
     }
@@ -95,31 +89,13 @@ export async function gerarPeticao(dados: DadosPeticao): Promise<string> {
   }
 }
 
-/**
- * Melhora a peticao usando IA (OpenAI)
- */
 async function melhorarComIA(peticao: string, informacoesAdicionais: string, tese: string): Promise<string> {
   try {
-    const prompt = `Voce e um advogado especialista em direito trabalhista e administrativo. 
-
-Melhore a seguinte peticao juridica sobre ${tese}, incorporando as informacoes adicionais fornecidas:
-
-Peticao Original:
-${peticao}
-
-Informacoes Adicionais do Caso:
-${informacoesAdicionais}
-
-Por favor, melhore a peticao mantendo a estrutura formal, mas tornando-a mais robusta e fundamentada com as informacoes fornecidas.`;
+    const prompt = 'Voce e um advogado. Melhore esta peticao: ' + peticao + '\n\nInformacoes adicionais: ' + informacoesAdicionais;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
+      messages: [{ role: 'user', content: prompt }],
       max_tokens: 2000,
       temperature: 0.7
     });
@@ -128,30 +104,17 @@ Por favor, melhore a peticao mantendo a estrutura formal, mas tornando-a mais ro
     return conteudo || peticao;
   } catch (error) {
     console.error('Erro ao melhorar com IA:', error);
-    // Retornar peticao original se IA falhar
     return peticao;
   }
 }
 
-/**
- * Analisa um documento e extrai informacoes relevantes
- */
 export async function analisarDocumento(conteudo: string, tipo: string): Promise<string[]> {
   try {
-    const prompt = `Voce e um analista juridico. Analise o seguinte documento de tipo "${tipo}" e extraia os pontos-chave relevantes para uma peticao juridica:
-
-${conteudo}
-
-Forneca uma lista de pontos-chave em formato de topicos.`;
+    const prompt = 'Analise este documento e extraia pontos-chave: ' + conteudo;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
+      messages: [{ role: 'user', content: prompt }],
       max_tokens: 1000,
       temperature: 0.7
     });
@@ -164,23 +127,13 @@ Forneca uma lista de pontos-chave em formato de topicos.`;
   }
 }
 
-/**
- * Gera um resumo de uma peticao
- */
 export async function gerarResumo(peticao: string): Promise<string> {
   try {
-    const prompt = `Voce e um advogado. Faca um resumo executivo da seguinte peticao juridica em no maximo 3 paragrafos:
-
-${peticao}`;
+    const prompt = 'Faca um resumo desta peticao: ' + peticao;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
+      messages: [{ role: 'user', content: prompt }],
       max_tokens: 500,
       temperature: 0.7
     });
@@ -192,13 +145,9 @@ ${peticao}`;
   }
 }
 
-/**
- * Valida uma peticao quanto a completude e qualidade
- */
 export async function validarPeticao(peticao: string): Promise<{ valida: boolean; avisos: string[] }> {
   const avisos: string[] = [];
 
-  // Validacoes basicas
   if (!peticao.includes('EXCELENTISSIMO')) {
     avisos.push('Falta saudacao formal ao juiz');
   }
