@@ -1,24 +1,24 @@
 import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+ apiKey: process.env.OPENAI_API_KEY
 });
 
 interface DadosPeticao {
-  tipo: string;
-  tese: string;
-  cliente: string;
-  processo: string;
-  modeloReferencia?: string;
-  informacoesAdicionais?: string;
+ tipo: string;
+ tese: string;
+ cliente: string;
+ processo: string;
+ modeloReferencia?: string;
+ informacoesAdicionais?: string;
 }
 
 interface TemplateModelo {
-  [key: string]: string;
+ [key: string]: string;
 }
 
 const templates: TemplateModelo = {
-  'replica-licenca-premio': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
+ 'replica-licenca-premio': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
 
 Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar REPLICA ao processo no [PROCESSO], relativo a demanda sobre LICENCA-PREMIO, pelos motivos de fato e de direito a seguir expostos:
 
@@ -36,7 +36,7 @@ Pelo exposto, requer-se a procedencia da demanda para condenar a parte adversa a
 
 Respeitosamente submetido.`,
 
-  'replica-abono-permanencia': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
+ 'replica-abono-permanencia': `EXCELENTISSIMO SENHOR DOUTOR JUIZ
 
 Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, apresentar REPLICA ao processo no [PROCESSO], relativo a demanda sobre ABONO DE PERMANENCIA, pelos motivos de fato e de direito a seguir expostos:
 
@@ -54,7 +54,7 @@ Pelo exposto, requer-se a procedencia da demanda.
 
 Respeitosamente submetido.`,
 
-  'recurso-padrao': `EXCELENTISSIMO SENHOR DOUTOR PRESIDENTE DO TRIBUNAL
+ 'recurso-padrao': `EXCELENTISSIMO SENHOR DOUTOR PRESIDENTE DO TRIBUNAL
 
 Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente [CLIENTE], por seu advogado infra-assinado, interpor RECURSO ao processo no [PROCESSO], pelos motivos de fato e de direito a seguir expostos:
 
@@ -70,102 +70,102 @@ Respeitosamente submetido.`
 };
 
 export async function gerarPeticao(dados: DadosPeticao): Promise<string> {
-  try {
-    const chaveTemplate = dados.tipo + '-' + dados.tese.toLowerCase();
-    let template = templates[chaveTemplate] || templates['recurso-padrao'];
+ try {
+ const chaveTemplate = dados.tipo + '-' + dados.tese.toLowerCase();
+ let template = templates[chaveTemplate] || templates['recurso-padrao'];
 
-    let peticao = template
-      .replace('[CLIENTE]', dados.cliente)
-      .replace('[PROCESSO]', dados.processo);
+ let peticao = template
+ .replace('[CLIENTE]', dados.cliente)
+ .replace('[PROCESSO]', dados.processo);
 
-    if (dados.informacoesAdicionais && dados.informacoesAdicionais.trim()) {
-      peticao = await melhorarComIA(peticao, dados.informacoesAdicionais, dados.tese);
-    }
+ if (dados.informacoesAdicionais && dados.informacoesAdicionais.trim()) {
+ peticao = await melhorarComIA(peticao, dados.informacoesAdicionais, dados.tese);
+ }
 
-    return peticao;
-  } catch (error) {
-    console.error('Erro ao gerar peticao:', error);
-    throw new Error('Erro ao gerar peticao');
-  }
+ return peticao;
+ } catch (error) {
+ console.error('Erro ao gerar peticao:', error);
+ throw new Error('Erro ao gerar peticao');
+ }
 }
 
 async function melhorarComIA(peticao: string, informacoesAdicionais: string, tese: string): Promise<string> {
-  try {
-    const prompt = 'Voce e um advogado. Melhore esta peticao: ' + peticao + '\n\nInformacoes adicionais: ' + informacoesAdicionais;
+ try {
+ const prompt = 'Voce e um advogado. Melhore esta peticao: ' + peticao + '\n\nInformacoes adicionais: ' + informacoesAdicionais;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 2000,
-      temperature: 0.7
-    });
+ const response = await openai.chat.completions.create({
+ model: 'gpt-4.1-mini',
+ messages: [{ role: 'user', content: prompt }],
+ max_tokens: 2000,
+ temperature: 0.7
+ });
 
-    const conteudo = response.choices[0]?.message?.content;
-    return conteudo || peticao;
-  } catch (error) {
-    console.error('Erro ao melhorar com IA:', error);
-    return peticao;
-  }
+ const conteudo = response.choices[0]?.message?.content;
+ return conteudo || peticao;
+ } catch (error) {
+ console.error('Erro ao melhorar com IA:', error);
+ return peticao;
+ }
 }
 
 export async function analisarDocumento(conteudo: string, tipo: string): Promise<string[]> {
-  try {
-    const prompt = 'Analise este documento e extraia pontos-chave: ' + conteudo;
+ try {
+ const prompt = 'Analise este documento e extraia pontos-chave: ' + conteudo;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 1000,
-      temperature: 0.7
-    });
+ const response = await openai.chat.completions.create({
+ model: 'gpt-4.1-mini',
+ messages: [{ role: 'user', content: prompt }],
+ max_tokens: 1000,
+ temperature: 0.7
+ });
 
-    const conteudo_resposta = response.choices[0]?.message?.content || '';
-    return conteudo_resposta.split('\n').filter(linha => linha.trim());
-  } catch (error) {
-    console.error('Erro ao analisar documento:', error);
-    return [];
-  }
+ const conteudo_resposta = response.choices[0]?.message?.content || '';
+ return conteudo_resposta.split('\n').filter(linha => linha.trim());
+ } catch (error) {
+ console.error('Erro ao analisar documento:', error);
+ return [];
+ }
 }
 
 export async function gerarResumo(peticao: string): Promise<string> {
-  try {
-    const prompt = 'Faca um resumo desta peticao: ' + peticao;
+ try {
+ const prompt = 'Faca um resumo desta peticao: ' + peticao;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 500,
-      temperature: 0.7
-    });
+ const response = await openai.chat.completions.create({
+ model: 'gpt-4.1-mini',
+ messages: [{ role: 'user', content: prompt }],
+ max_tokens: 500,
+ temperature: 0.7
+ });
 
-    return response.choices[0]?.message?.content || 'Resumo nao disponivel';
-  } catch (error) {
-    console.error('Erro ao gerar resumo:', error);
-    return 'Resumo nao disponivel';
-  }
+ return response.choices[0]?.message?.content || 'Resumo nao disponivel';
+ } catch (error) {
+ console.error('Erro ao gerar resumo:', error);
+ return 'Resumo nao disponivel';
+ }
 }
 
 export async function validarPeticao(peticao: string): Promise<{ valida: boolean; avisos: string[] }> {
-  const avisos: string[] = [];
+ const avisos: string[] = [];
 
-  if (!peticao.includes('EXCELENTISSIMO')) {
-    avisos.push('Falta saudacao formal ao juiz');
-  }
+ if (!peticao.includes('EXCELENTISSIMO')) {
+ avisos.push('Falta saudacao formal ao juiz');
+ }
 
-  if (!peticao.includes('Pelos motivos')) {
-    avisos.push('Falta introducao dos motivos');
-  }
+ if (!peticao.includes('Pelos motivos')) {
+ avisos.push('Falta introducao dos motivos');
+ }
 
-  if (!peticao.includes('PEDIDO') && !peticao.includes('pedido')) {
-    avisos.push('Falta secao de pedidos');
-  }
+ if (!peticao.includes('PEDIDO') && !peticao.includes('pedido')) {
+ avisos.push('Falta secao de pedidos');
+ }
 
-  if (peticao.length < 500) {
-    avisos.push('Peticao muito curta, considere adicionar mais argumentacao');
-  }
+ if (peticao.length < 500) {
+ avisos.push('Peticao muito curta, considere adicionar mais argumentacao');
+ }
 
-  return {
-    valida: avisos.length === 0,
-    avisos
-  };
+ return {
+ valida: avisos.length === 0,
+ avisos
+ };
 }

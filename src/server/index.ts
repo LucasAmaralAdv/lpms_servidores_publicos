@@ -21,15 +21,15 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-  credentials: true
+ origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+ credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'LPMS Server is running' });
+ res.json({ status: 'ok', message: 'LPMS Server is running' });
 });
 
 // API Routes
@@ -48,8 +48,8 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`LPMS Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+ console.log(`LPMS Server running on port ${PORT}`);
+ console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 export default app;
