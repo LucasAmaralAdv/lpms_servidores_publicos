@@ -1,1 +1,282 @@
-import React, { useState } from 'react';\nimport '../styles/AutomacaoPeticoes.css';\n\ninterface Peticao {\n id: string;\n tipo: string;\n tese: string;\n cliente: string;\n processo: string;\n dataCriacao: string;\n status: 'rascunho' | 'pronta' | 'enviada';\n conteudo: string;\n}\n\nexport function AutomacaoPeticoes() {\n const [step, setStep] = useState(1);\n const [formData, setFormData] = useState({\n tipo: 'replica',\n tese: 'licenca-premio',\n cliente: '',\n processo: '',\n modeloReferencia: '',\n informacoesAdicionais: ''\n });\n\n const [peticaoGerada, setPeticaoGerada] = useState<Peticao | null>(null);\n const [loading, setLoading] = useState(false);\n const [message, setMessage] = useState('');\n\n const tipos = [\n { value: 'replica', label: 'Replica' },\n { value: 'recurso', label: 'Recurso' },\n { value: 'contrarrazao', label: 'Contra-razao' },\n { value: 'embargo', label: 'Embargo' },\n { value: 'peticial', label: 'Peticao Inicial' }\n ];\n\n const teses = [\n { value: 'licenca-premio', label: 'Licenca-Premio' },\n { value: 'abono-permanencia', label: 'Abono Permanencia' },\n { value: 'diferencas-salariais', label: 'Diferencas Salariais' },\n { value: 'gratificacao', label: 'Gratificacao' },\n { value: 'indenizacao', label: 'Indenizacao' }\n ];\n\n const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {\n const { name, value } = e.target;\n setFormData(prev => ({\n ...prev,\n [name]: value\n }));\n };\n\n const handleGerarPeticao = async () => {\n setLoading(true);\n setMessage('');\n\n try {\n // Simular geracao de peticao\n await new Promise(resolve => setTimeout(resolve, 2000));\n\n const peticao: Peticao = {\n id: Math.random().toString(36).substr(2, 9),\n tipo: formData.tipo,\n tese: formData.tese,\n cliente: formData.cliente,\n processo: formData.processo,\n dataCriacao: new Date().toLocaleDateString('pt-BR'),\n status: 'pronta',\n conteudo: `EXCELENTSSIMO SENHOR DOUTOR JUIZ DA ${formData.tese.toUpperCase()}\n\nVem, respeitosamente, perante Vossa Excelencia, o(a) cliente ${formData.cliente}, por seu advogado infra-assinado, com fundamento no artigo 5 da Constituicao Federal, apresentar ${formData.tipo.toUpperCase()} ao processo n ${formData.processo}, pelos motivos de fato e de direito a seguir expostos:\n\nI - DOS FATOS\n\n${formData.informacoesAdicionais || 'Conforme documentacao em anexo, o cliente faz jus aos direitos pleiteados.'}\n\nII - DO DIREITO\n\nA legislacao trabalhista e a jurisprudencia consolidada reconhecem o direito do cliente ao recebimento da verba em questao.\n\nIII - DO PEDIDO\n\nPelo exposto, requer-se:\n\na) A procedencia do pedido para condenar a parte adversa ao pagamento da verba devida;\nb) A condenacao em custas processuais e honorarios advocaticios.\n\nNestes termos, pede deferimento.\n\nRespeitosamente submetido,\n\n[Assinado digitalmente]\nAdvogado(a) Responsavel`\n };\n\n setPeticaoGerada(peticao);\n setMessage(' Peticao gerada com sucesso!');\n setStep(2);\n } catch (error) {\n setMessage(' Erro ao gerar peticao. Tente novamente.');\n } finally {\n setLoading(false);\n }\n };\n\n const handleBaixarPeticao = () => {\n if (!peticaoGerada) return;\n\n const element = document.createElement('a');\n const file = new Blob([peticaoGerada.conteudo], { type: 'text/plain' });\n element.href = URL.createObjectURL(file);\n element.download = `${peticaoGerada.tipo}_${peticaoGerada.processo}.txt`;\n document.body.appendChild(element);\n element.click();\n document.body.removeChild(element);\n };\n\n return (\n <div className=\"automacao-container\">\n <div className=\"automacao-card\">\n <div className=\"automacao-header\">\n <h1>Automacao de Peticoes</h1>\n <p>Gere peticoes automaticamente com base em modelos e analise de IA</p>\n </div>\n\n {message && (\n <div className={`message ${message.includes('') ? 'success' : 'error'}`}>\n {message}\n </div>\n )}\n\n {/* Step 1: Configuracao */}\n {step === 1 && (\n <div className=\"form-step\">\n <h2>Configuracao da Peticao</h2>\n\n <div className=\"form-group\">\n <label>Tipo de Peticao *</label>\n <select\n name=\"tipo\"\n value={formData.tipo}\n onChange={handleInputChange}\n required\n >\n {tipos.map(t => (\n <option key={t.value} value={t.value}>{t.label}</option>\n ))}\n </select>\n </div>\n\n <div className=\"form-group\">\n <label>Tese Juridica *</label>\n <select\n name=\"tese\"\n value={formData.tese}\n onChange={handleInputChange}\n required\n >\n {teses.map(t => (\n <option key={t.value} value={t.value}>{t.label}</option>\n ))}\n </select>\n </div>\n\n <div className=\"form-row\">\n <div className=\"form-group\">\n <label>Cliente *</label>\n <input\n type=\"text\"\n name=\"cliente\"\n value={formData.cliente}\n onChange={handleInputChange}\n placeholder=\"Nome do cliente\"\n required\n />\n </div>\n\n <div className=\"form-group\">\n <label>Numero do Processo *</label>\n <input\n type=\"text\"\n name=\"processo\"\n value={formData.processo}\n onChange={handleInputChange}\n placeholder=\"0001234-56.2023.5.10.0001\"\n required\n />\n </div>\n </div>\n\n <div className=\"form-group\">\n <label>Modelo de Referencia</label>\n <select\n name=\"modeloReferencia\"\n value={formData.modeloReferencia}\n onChange={handleInputChange}\n >\n <option value=\"\">Selecione um modelo...</option>\n <option value=\"modelo1\">Modelo Padrao - Licenca-Premio</option>\n <option value=\"modelo2\">Modelo Padrao - Abono Permanencia</option>\n <option value=\"modelo3\">Modelo Padrao - Diferencas Salariais</option>\n </select>\n </div>\n\n <div className=\"form-group\">\n <label>Informacoes Adicionais</label>\n <textarea\n name=\"informacoesAdicionais\"\n value={formData.informacoesAdicionais}\n onChange={handleInputChange}\n placeholder=\"Adicione informacoes especificas do caso...\"\n rows={4}\n />\n </div>\n\n <button\n onClick={handleGerarPeticao}\n disabled={loading || !formData.cliente || !formData.processo}\n className=\"btn btn-primary\"\n >\n {loading ? ' Gerando...' : ' Gerar Peticao'}\n </button>\n </div>\n )}\n\n {/* Step 2: Revisao e Download */}\n {step === 2 && peticaoGerada && (\n <div className=\"form-step\">\n <h2>Peticao Gerada</h2>\n\n <div className=\"peticao-info\">\n <div className=\"info-row\">\n <span className=\"label\">Tipo:</span>\n <span className=\"value\">{peticaoGerada.tipo.toUpperCase()}</span>\n </div>\n <div className=\"info-row\">\n <span className=\"label\">Tese:</span>\n <span className=\"value\">{peticaoGerada.tese}</span>\n </div>\n <div className=\"info-row\">\n <span className=\"label\">Cliente:</span>\n <span className=\"value\">{peticaoGerada.cliente}</span>\n </div>\n <div className=\"info-row\">\n <span className=\"label\">Processo:</span>\n <span className=\"value\">{peticaoGerada.processo}</span>\n </div>\n <div className=\"info-row\">\n <span className=\"label\">Status:</span>\n <span className=\"value status-pronta\">Pronta para Envio</span>\n </div>\n </div>\n\n <div className=\"peticao-preview\">\n <h3>Preview do Conteudo</h3>\n <div className=\"preview-box\">\n {peticaoGerada.conteudo.split('\\n').map((linha, idx) => (\n <p key={idx}>{linha}</p>\n ))}\n </div>\n </div>\n\n <div className=\"acoes\">\n <button onClick={() => setStep(1)} className=\"btn btn-secondary\">\n Voltar\n </button>\n <button onClick={handleBaixarPeticao} className=\"btn btn-success\">\n Baixar Peticao\n </button>\n <button className=\"btn btn-primary\">\n Enviar para Protocolo\n </button>\n </div>\n </div>\n )}\n </div>\n </div>\n );\n}\n
+import React, { useState } from 'react';
+import '../styles/AutomacaoPeticoes.css';
+
+interface Peticao {
+ id: string;
+ tipo: string;
+ tese: string;
+ cliente: string;
+ processo: string;
+ dataCriacao: string;
+ status: 'rascunho' | 'pronta' | 'enviada';
+ conteudo: string;
+}
+
+export function AutomacaoPeticoes() {
+ const [step, setStep] = useState(1);
+ const [formData, setFormData] = useState({
+ tipo: 'replica',
+ tese: 'licenca-premio',
+ cliente: '',
+ processo: '',
+ modeloReferencia: '',
+ informacoesAdicionais: ''
+ });
+
+ const [peticaoGerada, setPeticaoGerada] = useState<Peticao | null>(null);
+ const [loading, setLoading] = useState(false);
+ const [message, setMessage] = useState('');
+
+ const tipos = [
+ { value: 'replica', label: 'Replica' },
+ { value: 'recurso', label: 'Recurso' },
+ { value: 'contrarrazao', label: 'Contra-razao' },
+ { value: 'embargo', label: 'Embargo' },
+ { value: 'peticial', label: 'Peticao Inicial' }
+ ];
+
+ const teses = [
+ { value: 'licenca-premio', label: 'Licenca-Premio' },
+ { value: 'abono-permanencia', label: 'Abono Permanencia' },
+ { value: 'diferencas-salariais', label: 'Diferencas Salariais' },
+ { value: 'gratificacao', label: 'Gratificacao' },
+ { value: 'indenizacao', label: 'Indenizacao' }
+ ];
+
+ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+ const { name, value } = e.target;
+ setFormData(prev => ({
+ ...prev,
+ [name]: value
+ }));
+ };
+
+ const handleGerarPeticao = async () => {
+ setLoading(true);
+ setMessage('');
+
+ try {
+ // Simular geracao de peticao
+ await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const peticao: Peticao = {
+ id: Math.random().toString(36).substr(2, 9),
+ tipo: formData.tipo,
+ tese: formData.tese,
+ cliente: formData.cliente,
+ processo: formData.processo,
+ dataCriacao: new Date().toLocaleDateString('pt-BR'),
+ status: 'pronta',
+ conteudo: `EXCELENTSSIMO SENHOR DOUTOR JUIZ DA ${formData.tese.toUpperCase()}
+
+Vem, respeitosamente, perante Vossa Excelencia, o(a) cliente ${formData.cliente}, por seu advogado infra-assinado, com fundamento no artigo 5 da Constituicao Federal, apresentar ${formData.tipo.toUpperCase()} ao processo n ${formData.processo}, pelos motivos de fato e de direito a seguir expostos:
+
+I - DOS FATOS
+
+${formData.informacoesAdicionais || 'Conforme documentacao em anexo, o cliente faz jus aos direitos pleiteados.'}
+
+II - DO DIREITO
+
+A legislacao trabalhista e a jurisprudencia consolidada reconhecem o direito do cliente ao recebimento da verba em questao.
+
+III - DO PEDIDO
+
+Pelo exposto, requer-se:
+
+a) A procedencia do pedido para condenar a parte adversa ao pagamento da verba devida;
+b) A condenacao em custas processuais e honorarios advocaticios.
+
+Nestes termos, pede deferimento.
+
+Respeitosamente submetido,
+
+[Assinado digitalmente]
+Advogado(a) Responsavel`
+ };
+
+ setPeticaoGerada(peticao);
+ setMessage(' Peticao gerada com sucesso!');
+ setStep(2);
+ } catch (error) {
+ setMessage(' Erro ao gerar peticao. Tente novamente.');
+ } finally {
+ setLoading(false);
+ }
+ };
+
+ const handleBaixarPeticao = () => {
+ if (!peticaoGerada) return;
+
+ const element = document.createElement('a');
+ const file = new Blob([peticaoGerada.conteudo], { type: 'text/plain' });
+ element.href = URL.createObjectURL(file);
+ element.download = `${peticaoGerada.tipo}_${peticaoGerada.processo}.txt`;
+ document.body.appendChild(element);
+ element.click();
+ document.body.removeChild(element);
+ };
+
+ return (
+ <div className=\"automacao-container\">
+ <div className=\"automacao-card\">
+ <div className=\"automacao-header\">
+ <h1>Automacao de Peticoes</h1>
+ <p>Gere peticoes automaticamente com base em modelos e analise de IA</p>
+ </div>
+
+ {message && (
+ <div className={`message ${message.includes('') ? 'success' : 'error'}`}>
+ {message}
+ </div>
+ )}
+
+ {/* Step 1: Configuracao */}
+ {step === 1 && (
+ <div className=\"form-step\">
+ <h2>Configuracao da Peticao</h2>
+
+ <div className=\"form-group\">
+ <label>Tipo de Peticao *</label>
+ <select
+ name=\"tipo\"
+ value={formData.tipo}
+ onChange={handleInputChange}
+ required
+ >
+ {tipos.map(t => (
+ <option key={t.value} value={t.value}>{t.label}</option>
+ ))}
+ </select>
+ </div>
+
+ <div className=\"form-group\">
+ <label>Tese Juridica *</label>
+ <select
+ name=\"tese\"
+ value={formData.tese}
+ onChange={handleInputChange}
+ required
+ >
+ {teses.map(t => (
+ <option key={t.value} value={t.value}>{t.label}</option>
+ ))}
+ </select>
+ </div>
+
+ <div className=\"form-row\">
+ <div className=\"form-group\">
+ <label>Cliente *</label>
+ <input
+ type=\"text\"
+ name=\"cliente\"
+ value={formData.cliente}
+ onChange={handleInputChange}
+ placeholder=\"Nome do cliente\"
+ required
+ />
+ </div>
+
+ <div className=\"form-group\">
+ <label>Numero do Processo *</label>
+ <input
+ type=\"text\"
+ name=\"processo\"
+ value={formData.processo}
+ onChange={handleInputChange}
+ placeholder=\"0001234-56.2023.5.10.0001\"
+ required
+ />
+ </div>
+ </div>
+
+ <div className=\"form-group\">
+ <label>Modelo de Referencia</label>
+ <select
+ name=\"modeloReferencia\"
+ value={formData.modeloReferencia}
+ onChange={handleInputChange}
+ >
+ <option value=\"\">Selecione um modelo...</option>
+ <option value=\"modelo1\">Modelo Padrao - Licenca-Premio</option>
+ <option value=\"modelo2\">Modelo Padrao - Abono Permanencia</option>
+ <option value=\"modelo3\">Modelo Padrao - Diferencas Salariais</option>
+ </select>
+ </div>
+
+ <div className=\"form-group\">
+ <label>Informacoes Adicionais</label>
+ <textarea
+ name=\"informacoesAdicionais\"
+ value={formData.informacoesAdicionais}
+ onChange={handleInputChange}
+ placeholder=\"Adicione informacoes especificas do caso...\"
+ rows={4}
+ />
+ </div>
+
+ <button
+ onClick={handleGerarPeticao}
+ disabled={loading || !formData.cliente || !formData.processo}
+ className=\"btn btn-primary\"
+ >
+ {loading ? ' Gerando...' : ' Gerar Peticao'}
+ </button>
+ </div>
+ )}
+
+ {/* Step 2: Revisao e Download */}
+ {step === 2 && peticaoGerada && (
+ <div className=\"form-step\">
+ <h2>Peticao Gerada</h2>
+
+ <div className=\"peticao-info\">
+ <div className=\"info-row\">
+ <span className=\"label\">Tipo:</span>
+ <span className=\"value\">{peticaoGerada.tipo.toUpperCase()}</span>
+ </div>
+ <div className=\"info-row\">
+ <span className=\"label\">Tese:</span>
+ <span className=\"value\">{peticaoGerada.tese}</span>
+ </div>
+ <div className=\"info-row\">
+ <span className=\"label\">Cliente:</span>
+ <span className=\"value\">{peticaoGerada.cliente}</span>
+ </div>
+ <div className=\"info-row\">
+ <span className=\"label\">Processo:</span>
+ <span className=\"value\">{peticaoGerada.processo}</span>
+ </div>
+ <div className=\"info-row\">
+ <span className=\"label\">Status:</span>
+ <span className=\"value status-pronta\">Pronta para Envio</span>
+ </div>
+ </div>
+
+ <div className=\"peticao-preview\">
+ <h3>Preview do Conteudo</h3>
+ <div className=\"preview-box\">
+ {peticaoGerada.conteudo.split('\
+').map((linha, idx) => (
+ <p key={idx}>{linha}</p>
+ ))}
+ </div>
+ </div>
+
+ <div className=\"acoes\">
+ <button onClick={() => setStep(1)} className=\"btn btn-secondary\">
+ Voltar
+ </button>
+ <button onClick={handleBaixarPeticao} className=\"btn btn-success\">
+ Baixar Peticao
+ </button>
+ <button className=\"btn btn-primary\">
+ Enviar para Protocolo
+ </button>
+ </div>
+ </div>
+ )}
+ </div>
+ </div>
+ );
+}
+

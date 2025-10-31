@@ -1,1 +1,184 @@
-import express, { Router, Response } from 'express';\nimport { gerarPeticao, analisarDocumento, gerarResumo, validarPeticao } from '../services/peticaoService';\nimport { authMiddleware, AuthRequest } from '../middleware';\n\nconst router = Router();\n\n// Gerar peticao\nrouter.post('/gerar', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { tipo, tese, cliente, processo, modeloReferencia, informacoesAdicionais } = req.body;\n\n if (!tipo || !tese || !cliente || !processo) {\n return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });\n }\n\n const peticao = await gerarPeticao({\n tipo,\n tese,\n cliente,\n processo,\n modeloReferencia,\n informacoesAdicionais\n });\n\n // Validar peticao\n const validacao = await validarPeticao(peticao);\n\n res.json({\n id: Math.random().toString(36).substr(2, 9),\n tipo,\n tese,\n cliente,\n processo,\n conteudo: peticao,\n status: 'pronta',\n dataCriacao: new Date().toISOString(),\n validacao\n });\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\n// Analisar documento\nrouter.post('/analisar', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { conteudo, tipo } = req.body;\n\n if (!conteudo) {\n return res.status(400).json({ error: 'Conteudo do documento e obrigatorio' });\n }\n\n const pontosChave = await analisarDocumento(conteudo, tipo || 'documento');\n\n res.json({\n pontosChave,\n totalPontos: pontosChave.length\n });\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\n// Gerar resumo de peticao\nrouter.post('/resumo', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { peticao } = req.body;\n\n if (!peticao) {\n return res.status(400).json({ error: 'Peticao e obrigatoria' });\n }\n\n const resumo = await gerarResumo(peticao);\n\n res.json({ resumo });\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\n// Validar peticao\nrouter.post('/validar', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { peticao } = req.body;\n\n if (!peticao) {\n return res.status(400).json({ error: 'Peticao e obrigatoria' });\n }\n\n const validacao = await validarPeticao(peticao);\n\n res.json(validacao);\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\n// Listar peticoes do usuario\nrouter.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n // Simular listagem de peticoes\n const peticoes = [\n {\n id: '1',\n tipo: 'replica',\n tese: 'Licenca-Premio',\n cliente: 'Joao Silva',\n processo: '#001',\n status: 'pronta',\n dataCriacao: '28/10/2025'\n },\n {\n id: '2',\n tipo: 'recurso',\n tese: 'Abono Permanencia',\n cliente: 'Maria Santos',\n processo: '#002',\n status: 'enviada',\n dataCriacao: '27/10/2025'\n }\n ];\n\n res.json(peticoes);\n } catch (error: any) {\n res.status(500).json({ error: error.message });\n }\n});\n\n// Obter peticao especifica\nrouter.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { id } = req.params;\n\n // Simular busca de peticao\n const peticao = {\n id,\n tipo: 'replica',\n tese: 'Licenca-Premio',\n cliente: 'Joao Silva',\n processo: '#001',\n conteudo: 'Conteudo da peticao...',\n status: 'pronta',\n dataCriacao: '28/10/2025'\n };\n\n res.json(peticao);\n } catch (error: any) {\n res.status(500).json({ error: error.message });\n }\n});\n\n// Atualizar peticao\nrouter.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { id } = req.params;\n const { conteudo, status } = req.body;\n\n // Simular atualizacao\n const peticao = {\n id,\n conteudo,\n status,\n dataAtualizacao: new Date().toISOString()\n };\n\n res.json(peticao);\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\n// Deletar peticao\nrouter.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {\n try {\n const { id } = req.params;\n\n res.json({ message: `Peticao ${id} deletada com sucesso` });\n } catch (error: any) {\n res.status(400).json({ error: error.message });\n }\n});\n\nexport default router;\n
+import express, { Router, Response } from 'express';
+import { gerarPeticao, analisarDocumento, gerarResumo, validarPeticao } from '../services/peticaoService';
+import { authMiddleware, AuthRequest } from '../middleware';
+
+const router = Router();
+
+// Gerar peticao
+router.post('/gerar', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { tipo, tese, cliente, processo, modeloReferencia, informacoesAdicionais } = req.body;
+
+ if (!tipo || !tese || !cliente || !processo) {
+ return res.status(400).json({ error: 'Campos obrigatorios nao preenchidos' });
+ }
+
+ const peticao = await gerarPeticao({
+ tipo,
+ tese,
+ cliente,
+ processo,
+ modeloReferencia,
+ informacoesAdicionais
+ });
+
+ // Validar peticao
+ const validacao = await validarPeticao(peticao);
+
+ res.json({
+ id: Math.random().toString(36).substr(2, 9),
+ tipo,
+ tese,
+ cliente,
+ processo,
+ conteudo: peticao,
+ status: 'pronta',
+ dataCriacao: new Date().toISOString(),
+ validacao
+ });
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+// Analisar documento
+router.post('/analisar', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { conteudo, tipo } = req.body;
+
+ if (!conteudo) {
+ return res.status(400).json({ error: 'Conteudo do documento e obrigatorio' });
+ }
+
+ const pontosChave = await analisarDocumento(conteudo, tipo || 'documento');
+
+ res.json({
+ pontosChave,
+ totalPontos: pontosChave.length
+ });
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+// Gerar resumo de peticao
+router.post('/resumo', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { peticao } = req.body;
+
+ if (!peticao) {
+ return res.status(400).json({ error: 'Peticao e obrigatoria' });
+ }
+
+ const resumo = await gerarResumo(peticao);
+
+ res.json({ resumo });
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+// Validar peticao
+router.post('/validar', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { peticao } = req.body;
+
+ if (!peticao) {
+ return res.status(400).json({ error: 'Peticao e obrigatoria' });
+ }
+
+ const validacao = await validarPeticao(peticao);
+
+ res.json(validacao);
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+// Listar peticoes do usuario
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ // Simular listagem de peticoes
+ const peticoes = [
+ {
+ id: '1',
+ tipo: 'replica',
+ tese: 'Licenca-Premio',
+ cliente: 'Joao Silva',
+ processo: '#001',
+ status: 'pronta',
+ dataCriacao: '28/10/2025'
+ },
+ {
+ id: '2',
+ tipo: 'recurso',
+ tese: 'Abono Permanencia',
+ cliente: 'Maria Santos',
+ processo: '#002',
+ status: 'enviada',
+ dataCriacao: '27/10/2025'
+ }
+ ];
+
+ res.json(peticoes);
+ } catch (error: any) {
+ res.status(500).json({ error: error.message });
+ }
+});
+
+// Obter peticao especifica
+router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { id } = req.params;
+
+ // Simular busca de peticao
+ const peticao = {
+ id,
+ tipo: 'replica',
+ tese: 'Licenca-Premio',
+ cliente: 'Joao Silva',
+ processo: '#001',
+ conteudo: 'Conteudo da peticao...',
+ status: 'pronta',
+ dataCriacao: '28/10/2025'
+ };
+
+ res.json(peticao);
+ } catch (error: any) {
+ res.status(500).json({ error: error.message });
+ }
+});
+
+// Atualizar peticao
+router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { id } = req.params;
+ const { conteudo, status } = req.body;
+
+ // Simular atualizacao
+ const peticao = {
+ id,
+ conteudo,
+ status,
+ dataAtualizacao: new Date().toISOString()
+ };
+
+ res.json(peticao);
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+// Deletar peticao
+router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+ try {
+ const { id } = req.params;
+
+ res.json({ message: `Peticao ${id} deletada com sucesso` });
+ } catch (error: any) {
+ res.status(400).json({ error: error.message });
+ }
+});
+
+export default router;
+

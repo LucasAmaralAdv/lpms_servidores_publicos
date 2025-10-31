@@ -1,1 +1,377 @@
-import React, { useState } from 'react';\nimport '../styles/RespostaSistematizada.css';\n\ninterface Resposta {\n id: string;\n cliente: string;\n pergunta: string;\n respostaAutomatica: string;\n respostaPersonalizada?: string;\n tipo: 'andamento' | 'documentos' | 'prazos' | 'honorarios' | 'outro';\n dataCriacao: string;\n status: 'pendente' | 'enviada' | 'respondida';\n canalEnvio?: 'whatsapp' | 'email' | 'sms';\n}\n\nconst respostasTemplate = {\n andamento: `Prezado(a) [CLIENTE],\n\nObrigado por entrar em contato conosco.\n\nSobre o andamento do seu processo n [PROCESSO]:\n\nO processo encontra-se em fase de [FASE]. O ultimo andamento foi registrado em [DATA], quando [EVENTO].\n\nO proximo prazo importante e em [PROXIMO_PRAZO], quando [ACAO].\n\nContinuamos acompanhando seu caso com atencao e o manteremos informado sobre qualquer desenvolvimento importante.\n\nQualquer duvida, nao hesite em entrar em contato.\n\nAtenciosamente,\nEquipe Juridica`,\n\n documentos: `Prezado(a) [CLIENTE],\n\nObrigado por sua pergunta.\n\nOs documentos necessarios para seu caso sao:\n\n1. [DOC1]\n2. [DOC2]\n3. [DOC3]\n\nPor favor, envie-nos esses documentos assim que possivel para que possamos prosseguir com seu processo.\n\nCaso tenha duvidas sobre como obter esses documentos, estamos a disposicao para ajuda-lo.\n\nAtenciosamente,\nEquipe Juridica`,\n\n prazos: `Prezado(a) [CLIENTE],\n\nObrigado por entrar em contato.\n\nOs prazos importantes do seu processo sao:\n\n- [PRAZO1]: [DESCRICAO1]\n- [PRAZO2]: [DESCRICAO2]\n- [PRAZO3]: [DESCRICAO3]\n\nEstamos acompanhando todos esses prazos para garantir que nenhum seja perdido.\n\nAtenciosamente,\nEquipe Juridica`,\n\n honorarios: `Prezado(a) [CLIENTE],\n\nObrigado por sua pergunta sobre os honorarios.\n\nConforme contrato assinado entre as partes, os honorarios sao:\n\n[DETALHES_HONORARIOS]\n\nO pagamento pode ser realizado em [FORMAS_PAGAMENTO].\n\nCaso tenha duvidas, estamos a disposicao.\n\nAtenciosamente,\nEquipe Juridica`,\n\n outro: `Prezado(a) [CLIENTE],\n\nObrigado por entrar em contato conosco.\n\n[RESPOSTA_PERSONALIZADA]\n\nCaso tenha outras duvidas, nao hesite em nos contatar.\n\nAtenciosamente,\nEquipe Juridica`\n};\n\nexport function RespostaSistematizada() {\n const [step, setStep] = useState(1);\n const [respostas, setRespostas] = useState<Resposta[]>([\n {\n id: '1',\n cliente: 'Joao Silva',\n pergunta: 'Como esta o andamento do meu processo?',\n respostaAutomatica: 'Seu processo esta em fase de julgamento...',\n tipo: 'andamento',\n dataCriacao: '28/10/2025',\n status: 'pendente'\n },\n {\n id: '2',\n cliente: 'Maria Santos',\n pergunta: 'Quais documentos preciso enviar?',\n respostaAutomatica: 'Os documentos necessarios sao: Contracheque, Ficha Funcional...',\n tipo: 'documentos',\n dataCriacao: '27/10/2025',\n status: 'enviada'\n }\n ]);\n\n const [formData, setFormData] = useState({\n cliente: '',\n pergunta: '',\n tipo: 'outro' as const,\n canalEnvio: 'whatsapp' as const,\n respostaPersonalizada: ''\n });\n\n const [respostaGerada, setRespostaGerada] = useState('');\n const [loading, setLoading] = useState(false);\n const [message, setMessage] = useState('');\n const [filtroStatus, setFiltroStatus] = useState('todas');\n\n const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {\n const { name, value } = e.target;\n setFormData(prev => ({\n ...prev,\n [name]: value\n }));\n };\n\n const handleGerarResposta = async () => {\n setLoading(true);\n setMessage('');\n\n try {\n await new Promise(resolve => setTimeout(resolve, 1000));\n\n const template = respostasTemplate[formData.tipo];\n const resposta = template\n .replace('[CLIENTE]', formData.cliente)\n .replace('[PROCESSO]', '#001')\n .replace('[FASE]', 'julgamento')\n .replace('[DATA]', '28/10/2025')\n .replace('[EVENTO]', 'foi proferida sentenca')\n .replace('[PROXIMO_PRAZO]', '15/11/2025')\n .replace('[ACAO]', 'vence prazo para recurso');\n\n setRespostaGerada(resposta);\n setMessage(' Resposta gerada com sucesso!');\n setStep(2);\n } catch (error) {\n setMessage(' Erro ao gerar resposta. Tente novamente.');\n } finally {\n setLoading(false);\n }\n };\n\n const handleEnviarResposta = async () => {\n setLoading(true);\n setMessage('');\n\n try {\n await new Promise(resolve => setTimeout(resolve, 1500));\n\n const novaResposta: Resposta = {\n id: Math.random().toString(36).substr(2, 9),\n cliente: formData.cliente,\n pergunta: formData.pergunta,\n respostaAutomatica: respostaGerada,\n tipo: formData.tipo,\n dataCriacao: new Date().toLocaleDateString('pt-BR'),\n status: 'enviada',\n canalEnvio: formData.canalEnvio\n };\n\n setRespostas([novaResposta, ...respostas]);\n setMessage(` Resposta enviada via ${formData.canalEnvio.toUpperCase()}!`);\n setStep(1);\n setFormData({\n cliente: '',\n pergunta: '',\n tipo: 'outro',\n canalEnvio: 'whatsapp',\n respostaPersonalizada: ''\n });\n setRespostaGerada('');\n } catch (error) {\n setMessage(' Erro ao enviar resposta. Tente novamente.');\n } finally {\n setLoading(false);\n }\n };\n\n const respostasFiltradas = respostas.filter(r => \n filtroStatus === 'todas' || r.status === filtroStatus\n );\n\n return (\n <div className=\"resposta-container\">\n <div className=\"resposta-card\">\n <div className=\"resposta-header\">\n <h1>Resposta Sistematizada a Clientes</h1>\n <p>Responda perguntas de clientes com respostas padronizadas e personalizadas</p>\n </div>\n\n {message && (\n <div className={`message ${message.includes('') ? 'success' : 'error'}`}>\n {message}\n </div>\n )}\n\n <div className=\"resposta-layout\">\n {/* Painel Esquerdo - Formulario */}\n <div className=\"resposta-form-panel\">\n {step === 1 && (\n <div className=\"form-section\">\n <h2>Nova Resposta</h2>\n\n <div className=\"form-group\">\n <label>Cliente *</label>\n <input\n type=\"text\"\n name=\"cliente\"\n value={formData.cliente}\n onChange={handleInputChange}\n placeholder=\"Nome do cliente\"\n required\n />\n </div>\n\n <div className=\"form-group\">\n <label>Pergunta do Cliente *</label>\n <textarea\n name=\"pergunta\"\n value={formData.pergunta}\n onChange={handleInputChange}\n placeholder=\"Qual e a pergunta ou duvida do cliente?\"\n rows={3}\n required\n />\n </div>\n\n <div className=\"form-group\">\n <label>Tipo de Resposta *</label>\n <select\n name=\"tipo\"\n value={formData.tipo}\n onChange={handleInputChange}\n required\n >\n <option value=\"andamento\">Andamento do Processo</option>\n <option value=\"documentos\">Documentos Necessarios</option>\n <option value=\"prazos\">Prazos Processuais</option>\n <option value=\"honorarios\">Honorarios</option>\n <option value=\"outro\">Outro</option>\n </select>\n </div>\n\n <div className=\"form-group\">\n <label>Canal de Envio *</label>\n <select\n name=\"canalEnvio\"\n value={formData.canalEnvio}\n onChange={handleInputChange}\n required\n >\n <option value=\"whatsapp\">WhatsApp</option>\n <option value=\"email\">E-mail</option>\n <option value=\"sms\">SMS</option>\n </select>\n </div>\n\n <button\n onClick={handleGerarResposta}\n disabled={loading || !formData.cliente || !formData.pergunta}\n className=\"btn btn-primary\"\n >\n {loading ? ' Gerando...' : ' Gerar Resposta'}\n </button>\n </div>\n )}\n\n {step === 2 && (\n <div className=\"form-section\">\n <h2>Revisar Resposta</h2>\n\n <div className=\"resposta-preview\">\n <div className=\"preview-header\">\n <p><strong>Cliente:</strong> {formData.cliente}</p>\n <p><strong>Tipo:</strong> {formData.tipo}</p>\n </div>\n\n <div className=\"preview-content\">\n {respostaGerada.split('\\n').map((linha, idx) => (\n <p key={idx}>{linha}</p>\n ))}\n </div>\n </div>\n\n <div className=\"form-group\">\n <label>Personalizar Resposta (opcional)</label>\n <textarea\n name=\"respostaPersonalizada\"\n value={formData.respostaPersonalizada}\n onChange={handleInputChange}\n placeholder=\"Adicione ajustes personalizados...\"\n rows={3}\n />\n </div>\n\n <div className=\"acoes\">\n <button onClick={() => setStep(1)} className=\"btn btn-secondary\">\n Voltar\n </button>\n <button\n onClick={handleEnviarResposta}\n disabled={loading}\n className=\"btn btn-success\"\n >\n {loading ? ' Enviando...' : ` Enviar via ${formData.canalEnvio.toUpperCase()}`}\n </button>\n </div>\n </div>\n )}\n </div>\n\n {/* Painel Direito - Historico */}\n <div className=\"resposta-history-panel\">\n <h2>Historico de Respostas</h2>\n\n <div className=\"filtro\">\n <label>Status:</label>\n <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>\n <option value=\"todas\">Todas</option>\n <option value=\"pendente\">Pendentes</option>\n <option value=\"enviada\">Enviadas</option>\n <option value=\"respondida\">Respondidas</option>\n </select>\n </div>\n\n <div className=\"respostas-list\">\n {respostasFiltradas.length > 0 ? (\n respostasFiltradas.map(resp => (\n <div key={resp.id} className={`resposta-item ${resp.status}`}>\n <div className=\"item-header\">\n <h4>{resp.cliente}</h4>\n <span className={`status-badge ${resp.status}`}>\n {resp.status === 'pendente' && ''}\n {resp.status === 'enviada' && ''}\n {resp.status === 'respondida' && ''}\n </span>\n </div>\n <p className=\"pergunta\">{resp.pergunta}</p>\n <div className=\"item-footer\">\n <small>{resp.dataCriacao}</small>\n {resp.canalEnvio && <small>via {resp.canalEnvio.toUpperCase()}</small>}\n </div>\n </div>\n ))\n ) : (\n <p className=\"sem-dados\">Nenhuma resposta encontrada</p>\n )}\n </div>\n </div>\n </div>\n </div>\n </div>\n );\n}\n
+import React, { useState } from 'react';
+import '../styles/RespostaSistematizada.css';
+
+interface Resposta {
+ id: string;
+ cliente: string;
+ pergunta: string;
+ respostaAutomatica: string;
+ respostaPersonalizada?: string;
+ tipo: 'andamento' | 'documentos' | 'prazos' | 'honorarios' | 'outro';
+ dataCriacao: string;
+ status: 'pendente' | 'enviada' | 'respondida';
+ canalEnvio?: 'whatsapp' | 'email' | 'sms';
+}
+
+const respostasTemplate = {
+ andamento: `Prezado(a) [CLIENTE],
+
+Obrigado por entrar em contato conosco.
+
+Sobre o andamento do seu processo n [PROCESSO]:
+
+O processo encontra-se em fase de [FASE]. O ultimo andamento foi registrado em [DATA], quando [EVENTO].
+
+O proximo prazo importante e em [PROXIMO_PRAZO], quando [ACAO].
+
+Continuamos acompanhando seu caso com atencao e o manteremos informado sobre qualquer desenvolvimento importante.
+
+Qualquer duvida, nao hesite em entrar em contato.
+
+Atenciosamente,
+Equipe Juridica`,
+
+ documentos: `Prezado(a) [CLIENTE],
+
+Obrigado por sua pergunta.
+
+Os documentos necessarios para seu caso sao:
+
+1. [DOC1]
+2. [DOC2]
+3. [DOC3]
+
+Por favor, envie-nos esses documentos assim que possivel para que possamos prosseguir com seu processo.
+
+Caso tenha duvidas sobre como obter esses documentos, estamos a disposicao para ajuda-lo.
+
+Atenciosamente,
+Equipe Juridica`,
+
+ prazos: `Prezado(a) [CLIENTE],
+
+Obrigado por entrar em contato.
+
+Os prazos importantes do seu processo sao:
+
+- [PRAZO1]: [DESCRICAO1]
+- [PRAZO2]: [DESCRICAO2]
+- [PRAZO3]: [DESCRICAO3]
+
+Estamos acompanhando todos esses prazos para garantir que nenhum seja perdido.
+
+Atenciosamente,
+Equipe Juridica`,
+
+ honorarios: `Prezado(a) [CLIENTE],
+
+Obrigado por sua pergunta sobre os honorarios.
+
+Conforme contrato assinado entre as partes, os honorarios sao:
+
+[DETALHES_HONORARIOS]
+
+O pagamento pode ser realizado em [FORMAS_PAGAMENTO].
+
+Caso tenha duvidas, estamos a disposicao.
+
+Atenciosamente,
+Equipe Juridica`,
+
+ outro: `Prezado(a) [CLIENTE],
+
+Obrigado por entrar em contato conosco.
+
+[RESPOSTA_PERSONALIZADA]
+
+Caso tenha outras duvidas, nao hesite em nos contatar.
+
+Atenciosamente,
+Equipe Juridica`
+};
+
+export function RespostaSistematizada() {
+ const [step, setStep] = useState(1);
+ const [respostas, setRespostas] = useState<Resposta[]>([
+ {
+ id: '1',
+ cliente: 'Joao Silva',
+ pergunta: 'Como esta o andamento do meu processo?',
+ respostaAutomatica: 'Seu processo esta em fase de julgamento...',
+ tipo: 'andamento',
+ dataCriacao: '28/10/2025',
+ status: 'pendente'
+ },
+ {
+ id: '2',
+ cliente: 'Maria Santos',
+ pergunta: 'Quais documentos preciso enviar?',
+ respostaAutomatica: 'Os documentos necessarios sao: Contracheque, Ficha Funcional...',
+ tipo: 'documentos',
+ dataCriacao: '27/10/2025',
+ status: 'enviada'
+ }
+ ]);
+
+ const [formData, setFormData] = useState({
+ cliente: '',
+ pergunta: '',
+ tipo: 'outro' as const,
+ canalEnvio: 'whatsapp' as const,
+ respostaPersonalizada: ''
+ });
+
+ const [respostaGerada, setRespostaGerada] = useState('');
+ const [loading, setLoading] = useState(false);
+ const [message, setMessage] = useState('');
+ const [filtroStatus, setFiltroStatus] = useState('todas');
+
+ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+ const { name, value } = e.target;
+ setFormData(prev => ({
+ ...prev,
+ [name]: value
+ }));
+ };
+
+ const handleGerarResposta = async () => {
+ setLoading(true);
+ setMessage('');
+
+ try {
+ await new Promise(resolve => setTimeout(resolve, 1000));
+
+ const template = respostasTemplate[formData.tipo];
+ const resposta = template
+ .replace('[CLIENTE]', formData.cliente)
+ .replace('[PROCESSO]', '#001')
+ .replace('[FASE]', 'julgamento')
+ .replace('[DATA]', '28/10/2025')
+ .replace('[EVENTO]', 'foi proferida sentenca')
+ .replace('[PROXIMO_PRAZO]', '15/11/2025')
+ .replace('[ACAO]', 'vence prazo para recurso');
+
+ setRespostaGerada(resposta);
+ setMessage(' Resposta gerada com sucesso!');
+ setStep(2);
+ } catch (error) {
+ setMessage(' Erro ao gerar resposta. Tente novamente.');
+ } finally {
+ setLoading(false);
+ }
+ };
+
+ const handleEnviarResposta = async () => {
+ setLoading(true);
+ setMessage('');
+
+ try {
+ await new Promise(resolve => setTimeout(resolve, 1500));
+
+ const novaResposta: Resposta = {
+ id: Math.random().toString(36).substr(2, 9),
+ cliente: formData.cliente,
+ pergunta: formData.pergunta,
+ respostaAutomatica: respostaGerada,
+ tipo: formData.tipo,
+ dataCriacao: new Date().toLocaleDateString('pt-BR'),
+ status: 'enviada',
+ canalEnvio: formData.canalEnvio
+ };
+
+ setRespostas([novaResposta, ...respostas]);
+ setMessage(` Resposta enviada via ${formData.canalEnvio.toUpperCase()}!`);
+ setStep(1);
+ setFormData({
+ cliente: '',
+ pergunta: '',
+ tipo: 'outro',
+ canalEnvio: 'whatsapp',
+ respostaPersonalizada: ''
+ });
+ setRespostaGerada('');
+ } catch (error) {
+ setMessage(' Erro ao enviar resposta. Tente novamente.');
+ } finally {
+ setLoading(false);
+ }
+ };
+
+ const respostasFiltradas = respostas.filter(r => 
+ filtroStatus === 'todas' || r.status === filtroStatus
+ );
+
+ return (
+ <div className=\"resposta-container\">
+ <div className=\"resposta-card\">
+ <div className=\"resposta-header\">
+ <h1>Resposta Sistematizada a Clientes</h1>
+ <p>Responda perguntas de clientes com respostas padronizadas e personalizadas</p>
+ </div>
+
+ {message && (
+ <div className={`message ${message.includes('') ? 'success' : 'error'}`}>
+ {message}
+ </div>
+ )}
+
+ <div className=\"resposta-layout\">
+ {/* Painel Esquerdo - Formulario */}
+ <div className=\"resposta-form-panel\">
+ {step === 1 && (
+ <div className=\"form-section\">
+ <h2>Nova Resposta</h2>
+
+ <div className=\"form-group\">
+ <label>Cliente *</label>
+ <input
+ type=\"text\"
+ name=\"cliente\"
+ value={formData.cliente}
+ onChange={handleInputChange}
+ placeholder=\"Nome do cliente\"
+ required
+ />
+ </div>
+
+ <div className=\"form-group\">
+ <label>Pergunta do Cliente *</label>
+ <textarea
+ name=\"pergunta\"
+ value={formData.pergunta}
+ onChange={handleInputChange}
+ placeholder=\"Qual e a pergunta ou duvida do cliente?\"
+ rows={3}
+ required
+ />
+ </div>
+
+ <div className=\"form-group\">
+ <label>Tipo de Resposta *</label>
+ <select
+ name=\"tipo\"
+ value={formData.tipo}
+ onChange={handleInputChange}
+ required
+ >
+ <option value=\"andamento\">Andamento do Processo</option>
+ <option value=\"documentos\">Documentos Necessarios</option>
+ <option value=\"prazos\">Prazos Processuais</option>
+ <option value=\"honorarios\">Honorarios</option>
+ <option value=\"outro\">Outro</option>
+ </select>
+ </div>
+
+ <div className=\"form-group\">
+ <label>Canal de Envio *</label>
+ <select
+ name=\"canalEnvio\"
+ value={formData.canalEnvio}
+ onChange={handleInputChange}
+ required
+ >
+ <option value=\"whatsapp\">WhatsApp</option>
+ <option value=\"email\">E-mail</option>
+ <option value=\"sms\">SMS</option>
+ </select>
+ </div>
+
+ <button
+ onClick={handleGerarResposta}
+ disabled={loading || !formData.cliente || !formData.pergunta}
+ className=\"btn btn-primary\"
+ >
+ {loading ? ' Gerando...' : ' Gerar Resposta'}
+ </button>
+ </div>
+ )}
+
+ {step === 2 && (
+ <div className=\"form-section\">
+ <h2>Revisar Resposta</h2>
+
+ <div className=\"resposta-preview\">
+ <div className=\"preview-header\">
+ <p><strong>Cliente:</strong> {formData.cliente}</p>
+ <p><strong>Tipo:</strong> {formData.tipo}</p>
+ </div>
+
+ <div className=\"preview-content\">
+ {respostaGerada.split('\
+').map((linha, idx) => (
+ <p key={idx}>{linha}</p>
+ ))}
+ </div>
+ </div>
+
+ <div className=\"form-group\">
+ <label>Personalizar Resposta (opcional)</label>
+ <textarea
+ name=\"respostaPersonalizada\"
+ value={formData.respostaPersonalizada}
+ onChange={handleInputChange}
+ placeholder=\"Adicione ajustes personalizados...\"
+ rows={3}
+ />
+ </div>
+
+ <div className=\"acoes\">
+ <button onClick={() => setStep(1)} className=\"btn btn-secondary\">
+ Voltar
+ </button>
+ <button
+ onClick={handleEnviarResposta}
+ disabled={loading}
+ className=\"btn btn-success\"
+ >
+ {loading ? ' Enviando...' : ` Enviar via ${formData.canalEnvio.toUpperCase()}`}
+ </button>
+ </div>
+ </div>
+ )}
+ </div>
+
+ {/* Painel Direito - Historico */}
+ <div className=\"resposta-history-panel\">
+ <h2>Historico de Respostas</h2>
+
+ <div className=\"filtro\">
+ <label>Status:</label>
+ <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
+ <option value=\"todas\">Todas</option>
+ <option value=\"pendente\">Pendentes</option>
+ <option value=\"enviada\">Enviadas</option>
+ <option value=\"respondida\">Respondidas</option>
+ </select>
+ </div>
+
+ <div className=\"respostas-list\">
+ {respostasFiltradas.length > 0 ? (
+ respostasFiltradas.map(resp => (
+ <div key={resp.id} className={`resposta-item ${resp.status}`}>
+ <div className=\"item-header\">
+ <h4>{resp.cliente}</h4>
+ <span className={`status-badge ${resp.status}`}>
+ {resp.status === 'pendente' && ''}
+ {resp.status === 'enviada' && ''}
+ {resp.status === 'respondida' && ''}
+ </span>
+ </div>
+ <p className=\"pergunta\">{resp.pergunta}</p>
+ <div className=\"item-footer\">
+ <small>{resp.dataCriacao}</small>
+ {resp.canalEnvio && <small>via {resp.canalEnvio.toUpperCase()}</small>}
+ </div>
+ </div>
+ ))
+ ) : (
+ <p className=\"sem-dados\">Nenhuma resposta encontrada</p>
+ )}
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ );
+}
+

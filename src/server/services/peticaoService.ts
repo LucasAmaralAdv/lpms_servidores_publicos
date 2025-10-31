@@ -91,7 +91,9 @@ export async function gerarPeticao(dados: DadosPeticao): Promise<string> {
 
 async function melhorarComIA(peticao: string, informacoesAdicionais: string, tese: string): Promise<string> {
  try {
- const prompt = 'Voce e um advogado. Melhore esta peticao: ' + peticao + '\n\nInformacoes adicionais: ' + informacoesAdicionais;
+ const prompt = 'Voce e um advogado. Melhore esta peticao: ' + peticao + '
+
+Informacoes adicionais: ' + informacoesAdicionais;
 
  const response = await openai.chat.completions.create({
  model: 'gpt-4.1-mini',
@@ -120,7 +122,8 @@ export async function analisarDocumento(conteudo: string, tipo: string): Promise
  });
 
  const conteudo_resposta = response.choices[0]?.message?.content || '';
- return conteudo_resposta.split('\n').filter(linha => linha.trim());
+ return conteudo_resposta.split('
+').filter(linha => linha.trim());
  } catch (error) {
  console.error('Erro ao analisar documento:', error);
  return [];
